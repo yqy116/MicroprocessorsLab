@@ -53,9 +53,11 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	clrf	TRISD
 	movwf	PORTD
 	
-	call	translator
-write	movlw	PORTD
+	call table
+	;call	translator
+write	movf	0x77, W	
 	call	LCD_Send_Byte_D
+
 	goto	keyboard
 
 	
@@ -69,97 +71,64 @@ translator
 translator2
 	movlw	0xB7
 	CPFSEQ	PORTD
-	call	translator3
+	return
 	movlw	'2'
 	goto	write
+
+
+table
+	movlw	'1'
+	movwf	0x77
 	
-translator3	
-	movlw	0xD7
-	CPFSEQ	PORTD
-	call	translator4
+	movlw	'2'
+	movwf	0xB7
+	
 	movlw	'3'
-	goto	write
+	movwf	0xD7
 	
-translator4	
-	movlw	0x7B
-	CPFSEQ	PORTD
-	call	translator5
 	movlw	'4'
-	goto	write
+	movwf	0x7B
 	
-translator5	
+	movlw	'5'
+	movwf	0xBB
+	
+	movlw	'6'
+	movwf	0xDB
+	
+	movlw	'7'
+	movwf	0x7D	
+	
+	movlw	'8'
+	movwf	0xBD
+	
+	movlw	'9'
+	movwf	0xDD
+	
+	movlw	'A'
+	movwf	0x7E
+	
+	movlw	'B'
+	movwf	0xDE	
+	
+	movlw	'C'
+	movwf	0xEE	
+	
+	movlw	'D'
+	movwf	0xED
+	
+	movlw	'E'
+	movwf	0xEB	
+	
+	movlw	'F'
+	movwf	0xE7
+	
+	movlw	'0'
+	movwf	0xBE
+	
 	movlw	'?'
-	goto	write
+	movwf	0xBA
 	
-;	movwf	0x7B
-;	XORWF	PORTD, 0
-;	CPFSLT	0x01
-;	movlw	'4'
-;	
-;	movwf	0xBB
-;	XORWF	PORTD, 0
-;	CPFSLT	0x01
-;	movlw	'5'
-;	
-;	movwf	0xDB
-;	XORWF	PORTD, 0
-;	CPFSLT	0x01
-;	movlw	'6'
-;	
-;	movwf	0x7D	
-;	XORWF	PORTD, 0
-;	CPFSLT	0x01
-;	movlw	'7'
-;
-;	movwf	0xBD	
-;	XORWF	PORTD, 0
-;	CPFSLT	0x01
-;	movlw	'8'
-;
-;	movwf	0xDD	
-;	XORWF	PORTD, 0
-;	CPFSLT	0x01
-;	movlw	'9'
-
-	
-
 	return
-
-;	movlw	'1'
-;	movwf	0x77
-;	movlw	'2'
-;	movwf	0xB7
-;	movlw	'3'
-;	movwf	0xD7
-;	movlw	'4'
-;	movwf	0x7B
-;	movlw	'5'
-;	movwf	0xBB
-;	movlw	'6'
-;	movwf	0xDB
-;	movlw	'7'
-;	movwf	0x7D	
-;	movlw	'8'
-;	movwf	0xBD
-;	movlw	'9'
-;	movwf	0xDD
-;	movlw	'A'
-;	movwf	0x7E
-;	movlw	'B'
-;	movwf	0xDE	
-;	movlw	'C'
-;	movwf	0xEE	
-;	movlw	'D'
-;	movwf	0xED
-;	movlw	'E'
-;	movwf	0xEB		
-;	movlw	'F'
-;	movwf	0xE7
-;	movlw	'0'
-;	movwf	0xBE
-;	movlw	'?'
-;	movwf	0xBA
-;	
 delay	decfsz	0x20	; decrement until zero
 	bra delay
 	return	
