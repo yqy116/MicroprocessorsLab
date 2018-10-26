@@ -25,31 +25,7 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	bsf	EECON1, EEPGD 	; access Flash program memory
 	call	UART_Setup	; setup UART
 	call	LCD_Setup	; setup LCD
-	goto	start
-	
-	; ******* Main programme ****************************************
-start 	lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
-	movlw	upper(myTable)	; address of data in PM
-	movwf	TBLPTRU		; load upper bits to TBLPTRU
-	movlw	high(myTable)	; address of data in PM
-	movwf	TBLPTRH		; load high byte to TBLPTRH
-	movlw	low(myTable)	; address of data in PM
-	movwf	TBLPTRL		; load low byte to TBLPTRL
-	movlw	myTable_l	; bytes to read
-	movwf 	counter		; our counter register
-loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
-	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
-	decfsz	counter		; count down to zero
-	bra	loop		; keep going until finished
-		
-	movlw	myTable_l-1	; output message to LCD (leave out "\n")
-	lfsr	FSR2, myArray
-	call	LCD_Write_Message
-	
-
-	movlw	myTable_l	; output message to UART
-	lfsr	FSR2, myArray
-	call	UART_Transmit_Message
+	goto	keyboard
 
 
 	
@@ -78,87 +54,112 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	movwf	PORTD
 	
 	call	translator
-
-;	lfsr	FSR1, 0x77
-;	movlw	0x41
-;	call	LCD_Send_Byte_D
-	
+write	movlw	PORTD
+	call	LCD_Send_Byte_D
 	goto	keyboard
 
 	
 translator  
-	movlb	6
-	;lsfr	FSR1, 0x68
-
+	movlw	0x77
+	CPFSEQ	PORTD
+	call	translator2
 	movlw	'1'
-	movwf	0x77, BANKED
+	goto	write
 	
-	
+translator2
+	movlw	0xB7
+	CPFSEQ	PORTD
+	call	translator3
 	movlw	'2'
-	movwf	0xB7, BANKED	
+	goto	write
 	
-	
+translator3	
+	movlw	0xD7
+	CPFSEQ	PORTD
+	call	translator4
 	movlw	'3'
-	movwf	0xD7, BANKED
+	goto	write
 	
-	
+translator4	
+	movlw	0x7B
+	CPFSEQ	PORTD
+	call	translator5
 	movlw	'4'
-	movwf	0x7B, BANKED
+	goto	write
 	
-	
-	movlw	'5'
-	movwf	0xBB, BANKED
-	
-	
-	movlw	'6'
-	movwf	0xDB, BANKED
-	
-	
-	movlw	'7'
-	movwf	0x7D, BANKED
-	
-	
-	movlw	'8'
-	movwf	0xBD, BANKED
-	
-	
-	movlw	'9'
-	movwf	0xDD, BANKED
-	
-	
-	movlw	'A'
-	movwf	0x7E, BANKED
-	
-	
-	movlw	'B'
-	movwf	0xDE, BANKED
-	
-	
-	movlw	'C'
-	movwf	0xEE, BANKED
-	
-	
-	movlw	'D'
-	movwf	0xED, BANKED
-	
-	
-	movlw	'E'
-	movwf	0xEB, BANKED
-	
-	
-	movlw	'F'
-	movwf	0xE7, BANKED
-	
-	
-	movlw	'0'
-	movwf	0xBE, BANKED
-	
+translator5	
 	movlw	'?'
-	movwf	0xBA, BANKED
+	goto	write
+	
+;	movwf	0x7B
+;	XORWF	PORTD, 0
+;	CPFSLT	0x01
+;	movlw	'4'
+;	
+;	movwf	0xBB
+;	XORWF	PORTD, 0
+;	CPFSLT	0x01
+;	movlw	'5'
+;	
+;	movwf	0xDB
+;	XORWF	PORTD, 0
+;	CPFSLT	0x01
+;	movlw	'6'
+;	
+;	movwf	0x7D	
+;	XORWF	PORTD, 0
+;	CPFSLT	0x01
+;	movlw	'7'
+;
+;	movwf	0xBD	
+;	XORWF	PORTD, 0
+;	CPFSLT	0x01
+;	movlw	'8'
+;
+;	movwf	0xDD	
+;	XORWF	PORTD, 0
+;	CPFSLT	0x01
+;	movlw	'9'
+
+	
+
 	return
 
-
-	
+;	movlw	'1'
+;	movwf	0x77
+;	movlw	'2'
+;	movwf	0xB7
+;	movlw	'3'
+;	movwf	0xD7
+;	movlw	'4'
+;	movwf	0x7B
+;	movlw	'5'
+;	movwf	0xBB
+;	movlw	'6'
+;	movwf	0xDB
+;	movlw	'7'
+;	movwf	0x7D	
+;	movlw	'8'
+;	movwf	0xBD
+;	movlw	'9'
+;	movwf	0xDD
+;	movlw	'A'
+;	movwf	0x7E
+;	movlw	'B'
+;	movwf	0xDE	
+;	movlw	'C'
+;	movwf	0xEE	
+;	movlw	'D'
+;	movwf	0xED
+;	movlw	'E'
+;	movwf	0xEB		
+;	movlw	'F'
+;	movwf	0xE7
+;	movlw	'0'
+;	movwf	0xBE
+;	movlw	'?'
+;	movwf	0xBA
+;	
 delay	decfsz	0x20	; decrement until zero
 	bra delay
 	return	
@@ -166,7 +167,6 @@ delay	decfsz	0x20	; decrement until zero
 	end
 
 
-	
-	end
+
 
 	
