@@ -26,8 +26,6 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	call	UART_Setup	; setup UART
 	call	LCD_Setup	; setup LCD
 	goto	keyboard
-
-
 	
 keyboard	;banksel cannot be same line with a label,etc.start
 	banksel PADCFG1				;enable pull-ups and all that for PORTE
@@ -52,8 +50,12 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	iorwf	0x10,0,0
 	clrf	TRISD
 	movwf	PORTD
+	movlw	0xff
+	CPFSEQ	PORTD
+	call	write
+	call	keyboard
 	
-	call	table				;initialise the lookup table
+write	call	table				;initialise the lookup table
 	movlb	0				;select bank 0 so the access bank is used again
 	movf	PORTD, W			;use the pressed button to obtain the data from bank6
 	movff	PLUSW1, storage
@@ -61,6 +63,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	call	delay
 	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
 	CALL	LCD_delay_ms
+	
 	call	LCD_clear
 	goto	keyboard
 
