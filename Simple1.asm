@@ -6,7 +6,7 @@
 acs0	udata_acs   ; reserve data space in access ram
 counter	    res 1   ; reserve one byte for a counter variable
 delay_count res 1   ; reserve one byte for counter in the delay routine
-storage     res 10
+storage     res 1
 
 tables	udata	0x400    ; reserve data anywhere in RAM (here at 0x400)
 myArray res 0x80    ; reserve 128 bytes for message data
@@ -53,80 +53,130 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	clrf	TRISD
 	movwf	PORTD
 	
-	call table
-	;call	translator
-write	movf	0x77, W	
+	call	table
+	movlb	0
+	movf	PORTD, W
+	movff	PLUSW1, storage
+	movf	storage, W
+	
 	call	LCD_Send_Byte_D
+	
+	goto keyboard
+	
+	
+	
+	
+	;call	translator
+	;lfsr	FSR0, PORTD
+;write	;movf	0x77, W	
+;	call	LCD_Send_Byte_D
 
 	goto	keyboard
 
-	
-translator  
-	movlw	0x77
-	CPFSEQ	PORTD
-	call	translator2
-	movlw	'1'
-	goto	write
-	
-translator2
-	movlw	0xB7
-	CPFSEQ	PORTD
-	return
-	movlw	'2'
-	goto	write
+;	
+;translator  
+;	movlw	0x77
+;	CPFSEQ	PORTD
+;	call	translator2
+;	movlw	'5'
+;	goto	write
+;	
+;translator2
+;	movlw	0xB7
+;	CPFSEQ	PORTD
+;	return
+;	movlw	'2'
+;	goto	write
 
 
 table
+	movlb	6
+	lfsr	FSR1, 0x680 
 	movlw	'1'
-	movwf	0x77
+	movwf	storage
+	movlw	0x77
+	movff	storage, PLUSW1
 	
 	movlw	'2'
-	movwf	0xB7
+	movwf	storage
+	movlw	0xB7
+	movff	storage, PLUSW1
+	
 	
 	movlw	'3'
-	movwf	0xD7
+	movwf	storage
+	movlw	0xD7
+	movff	storage, PLUSW1
 	
 	movlw	'4'
-	movwf	0x7B
+	movwf	storage
+	movlw	0x7B
+	movff	storage, PLUSW1
 	
 	movlw	'5'
-	movwf	0xBB
+	movwf	storage
+	movlw	0xBB
+	movff	storage, PLUSW1
 	
 	movlw	'6'
-	movwf	0xDB
+	movwf	storage
+	movlw	0xDB
+	movff	storage, PLUSW1
 	
 	movlw	'7'
-	movwf	0x7D	
+	movwf	storage
+	movlw	0x7D
+	movff	storage, PLUSW1
 	
 	movlw	'8'
-	movwf	0xBD
+	movwf	storage
+	movlw	0xBD
+	movff	storage, PLUSW1
 	
 	movlw	'9'
-	movwf	0xDD
+	movwf	storage
+	movlw	0xDD
+	movff	storage, PLUSW1
 	
 	movlw	'A'
-	movwf	0x7E
+	movwf	storage
+	movlw	0x7E
+	movff	storage, PLUSW1
 	
 	movlw	'B'
-	movwf	0xDE	
+	movwf	storage
+	movlw	0xDE
+	movff	storage, PLUSW1
 	
 	movlw	'C'
-	movwf	0xEE	
+	movwf	storage
+	movlw	0xEE	
+	movff	storage, PLUSW1
 	
 	movlw	'D'
-	movwf	0xED
+	movwf	storage
+	movlw	0xED
+	movff	storage, PLUSW1
 	
 	movlw	'E'
-	movwf	0xEB	
+	movwf	storage
+	movlw	0xEB
+	movff	storage, PLUSW1
 	
 	movlw	'F'
-	movwf	0xE7
+	movwf	storage
+	movlw	0xE7
+	movff	storage, PLUSW1
 	
 	movlw	'0'
-	movwf	0xBE
+	movwf	storage
+	movlw	0xBE
+	movff	storage, PLUSW1
 	
 	movlw	'?'
-	movwf	0xBA
+	movwf	storage
+	movlw	0xFF
+	movff	storage, PLUSW1
 	
 	return
 delay	decfsz	0x20	; decrement until zero
