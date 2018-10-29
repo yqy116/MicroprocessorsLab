@@ -7,6 +7,9 @@ acs0	udata_acs   ; reserve data space in access ram
 counter	    res 1   ; reserve one byte for a counter variable
 delay_count res 1   ; reserve one byte for counter in the delay routine
 storage     res 1
+adder	    res 1
+key_data    res 1
+tempo	    res 1
 
 tables	udata	0x400    ; reserve data anywhere in RAM (here at 0x400)
 myArray res 0x80    ; reserve 128 bytes for message data
@@ -38,7 +41,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	movwf	PORTE
 	call	delay
 	movf	PORTE, W, ACCESS
-	movwf   0x10
+	movwf   adder
 	;Start the column			;gets the column byte
 	call	delay
 	movlw	0xF0
@@ -47,33 +50,39 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	movwf	PORTE
 	call	delay
 	movf	PORTE, W, ACCESS		;combine the row and column binary stuff and output it to portD
-	iorwf	0x10,0,0
+	iorwf	adder, W
 	clrf	TRISD
 	movwf	PORTD
+	movwf	tempo
+
 ;	
-;	movlw	0xff
-;	movwf	0x01
-;	CPFSEQ	0x01
-;	call	write
-;	call	keyboard
+check	
+	;movlb	0
+	movlw	0xff
+	CPFSEQ	tempo
+	goto	write
+	goto	keyboard
 ;	
-;write	call	table				;initialise the lookup table
-;	movlb	0				;select bank 0 so the access bank is used again
-;	movf	PORTD, W			;use the pressed button to obtain the data from bank6
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	call	delay
-;	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
-;	CALL	LCD_delay_ms
-;	
-;	call	LCD_clear
-;	goto	keyboard
+	
+write	call	table				;initialise the lookup table
+	movlb	0				;select bank 0 so the access bank is used again
+	movf	PORTD, W			;use the pressed button to obtain the data from bank6
+	movff	PLUSW1, storage
+	movf	storage, W
+	call	delay
+	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
+	CALL	LCD_delay_ms
+	
+	;call	LCD_clear
+
+	
+	goto	keyboard
 	
 
 table
 	movlb	6		    ;select bank 6
 	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
-	movlw	'1'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	movlw	'Z'		    ; load all of the ascii codes into locations +/- away from the FSR1
 	movwf	storage
 	movlw	0x77
 	movff	storage, PLUSW1
