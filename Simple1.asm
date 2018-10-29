@@ -50,47 +50,25 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	iorwf	0x10,0,0
 	clrf	TRISD
 	movwf	PORTD
-	movlw	0xff
-	CPFSEQ	PORTD
-	call	write
-	call	keyboard
-	
-write	call	table				;initialise the lookup table
-	movlb	0				;select bank 0 so the access bank is used again
-	movf	PORTD, W			;use the pressed button to obtain the data from bank6
-	movff	PLUSW1, storage
-	movf	storage, W
-	call	delay
-	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
-	CALL	LCD_delay_ms
-	
-	call	LCD_clear
-	goto	keyboard
-
-	
-	
-	
-	;call	translator
-	;lfsr	FSR0, PORTD
-;write	;movf	0x77, W	
-;	call	LCD_Send_Byte_D
-
-
 ;	
-;translator  
-;	movlw	0x77
-;	CPFSEQ	PORTD
-;	call	translator2
-;	movlw	'5'
-;	goto	write
+;	movlw	0xff
+;	movwf	0x01
+;	CPFSEQ	0x01
+;	call	write
+;	call	keyboard
 ;	
-;translator2
-;	movlw	0xB7
-;	CPFSEQ	PORTD
-;	return
-;	movlw	'2'
-;	goto	write
-
+;write	call	table				;initialise the lookup table
+;	movlb	0				;select bank 0 so the access bank is used again
+;	movf	PORTD, W			;use the pressed button to obtain the data from bank6
+;	movff	PLUSW1, storage
+;	movf	storage, W
+;	call	delay
+;	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
+;	CALL	LCD_delay_ms
+;	
+;	call	LCD_clear
+;	goto	keyboard
+	
 
 table
 	movlb	6		    ;select bank 6
@@ -185,7 +163,34 @@ table
 delay	decfsz	0x20	; decrement until zero
 	bra delay
 	return	
-	
+
+;
+;	call	translator
+;write	
+;	;movlw	'1'
+;	call	LCD_Send_Byte_D
+;	call	LCD_delay_ms
+;	call	LCD_clear
+;	goto	keyboard
+;
+;	
+;translator  
+;	movlw	0x77
+;	CPFSEQ	PORTD
+;	call	translator2
+;	movlw	'1'
+;	goto	write
+;	
+;translator2
+;	movlw	0xB7
+;	CPFSEQ	PORTD
+;	goto	translator3	
+;	movlw	'2'
+;	goto	write
+;
+;translator3
+;	movlw	'?'
+;	goto	write
 	end
 
 
