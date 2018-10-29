@@ -1,7 +1,7 @@
 #include p18f87k22.inc
 	
 	extern	UART_Setup, UART_Transmit_Message  ; external UART subroutines
-	extern  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_Send_Byte_D ; external LCD subroutines
+	extern  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_Send_Byte_D, LCD_delay_ms ; external LCD subroutines
 	
 acs0	udata_acs   ; reserve data space in access ram
 counter	    res 1   ; reserve one byte for a counter variable
@@ -30,39 +30,40 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 
 	
 keyboard	;banksel cannot be same line with a label,etc.start
-	banksel PADCFG1
+	banksel PADCFG1				;enable pull-ups and all that for PORTE
 	bsf	PADCFG1,REPU,BANKED
 	clrf	LATE
 	;Start the row 
-	movlw	0x0F
+	movlw	0x0F				;gets the row byte
 	movwf	TRISE
 	call	delay
 	movwf	PORTE
 	call	delay
 	movf	PORTE, W, ACCESS
 	movwf   0x10
-	;Start the column 
+	;Start the column			;gets the column byte
 	call	delay
 	movlw	0xF0
 	movwf	TRISE
 	call	delay
 	movwf	PORTE
 	call	delay
-	movf	PORTE, W, ACCESS
+	movf	PORTE, W, ACCESS		;combine the row and column binary stuff and output it to portD
 	iorwf	0x10,0,0
 	clrf	TRISD
 	movwf	PORTD
 	
-	call	table
-	movlb	0
-	movf	PORTD, W
+	call	table				;initialise the lookup table
+	movlb	0				;select bank 0 so the access bank is used again
+	movf	PORTD, W			;use the pressed button to obtain the data from bank6
 	movff	PLUSW1, storage
 	movf	storage, W
-	
-	call	LCD_Send_Byte_D
-	
-	goto keyboard
-	
+	call	delay
+	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
+	CALL	LCD_delay_ms
+	call	LCD_clear
+	goto	keyboard
+
 	
 	
 	
@@ -71,7 +72,6 @@ keyboard	;banksel cannot be same line with a label,etc.start
 ;write	;movf	0x77, W	
 ;	call	LCD_Send_Byte_D
 
-	goto	keyboard
 
 ;	
 ;translator  
@@ -90,9 +90,9 @@ keyboard	;banksel cannot be same line with a label,etc.start
 
 
 table
-	movlb	6
-	lfsr	FSR1, 0x680 
-	movlw	'1'
+	movlb	6		    ;select bank 6
+	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
+	movlw	'1'		    ; load all of the ascii codes into locations +/- away from the FSR1
 	movwf	storage
 	movlw	0x77
 	movff	storage, PLUSW1
