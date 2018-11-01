@@ -37,6 +37,7 @@ conversion
 	    bc	    add_carry
 	    bra	    merge
 
+
 add_carry   movlw   0x00
 	    addwfc   temp_4, W
 	    
@@ -45,4 +46,8 @@ merge	    lfsr    FSR1, myArray
 	    movwf   TBLPTRU	
 	    movff   temp_5, TBLPTRH
 	    movff   temp_1, TBLPTRL
-	    
+
+;multiply    movf    constant1, W
+;	    mulwf   eight
+;	    movff   PRODH, constant2
+;	    movff   PRODL, constant3
