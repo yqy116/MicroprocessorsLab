@@ -4,6 +4,7 @@
 	extern  LCD_Setup, LCD_Write_Message	    ; external LCD subroutines
 	extern	LCD_Write_Hex			    ; external LCD subroutines
 	extern  ADC_Setup, ADC_Read		    ; external ADC routines
+	extern	calculation
 	
 acs0	udata_acs   ; reserve data space in access ram
 counter	    res 1   ; reserve one byte for a counter variable
@@ -46,19 +47,20 @@ loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 		
 	movlw	myTable_l-1	; output message to LCD (leave out "\n")
 	lfsr	FSR2, myArray
-	call	LCD_Write_Message
+	;call	LCD_Write_Message
 
 	movlw	myTable_l	; output message to UART
 	lfsr	FSR2, myArray
-	call	UART_Transmit_Message
+	;call	UART_Transmit_Message
+	call	calculation
 	
-measure_loop
-	call	ADC_Read
-	movf	ADRESH,W
-	call	LCD_Write_Hex
-	movf	ADRESL,W
-	call	LCD_Write_Hex
-	goto	measure_loop		; goto current line in code
+;measure_loop
+;	call	ADC_Read	;taking 12bit and low sig bit to ADRESL, high bit to ADRESH
+;	movf	ADRESH,W
+;	call	LCD_Write_Hex
+;	movf	ADRESL,W
+;	call	LCD_Write_Hex
+;	goto	measure_loop		; goto current line in code
 
 	; a delay subroutine if you need one, times around loop in delay_count
 delay	decfsz	delay_count	; decrement until zero
@@ -66,3 +68,4 @@ delay	decfsz	delay_count	; decrement until zero
 	return
 
 	end
+	
