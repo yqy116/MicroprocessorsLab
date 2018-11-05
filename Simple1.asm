@@ -56,7 +56,31 @@ read	movff	PORTD, read_pos
 	call	LCD_delay_ms
 	return
 
-convert	
+lookup
+	movlb	6		    ;select bank 6
+	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
+	movlw	'green'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	movwf	storage
+	movlw	0x01
+	movff	storage, PLUSW1
+	
+	movlw	'blue'
+	movwf	storage
+	movlw	0x02
+	movff	storage, PLUSW1
+	
+	
+	movlw	'yellow'
+	movwf	storage
+	movlw	0x03
+	movff	storage, PLUSW1
+	
+	movlw	'red'
+	movwf	storage
+	movlw	0x04
+	movff	storage, PLUSW1
+	
+	
 	
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
