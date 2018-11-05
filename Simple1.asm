@@ -6,6 +6,7 @@ pos2	res 1
 pos3	res 1
 pos4	res 1
 read_pos res 1
+storage	res 1
 	
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -36,6 +37,7 @@ check	setf	TRISE
 	call	read
 	movff	read_pos, pos2
 	call	read
+	
 	movff	read_pos, pos3
 	call	read
 	movff	read_pos, pos4
@@ -49,35 +51,54 @@ check	setf	TRISE
 	ANDWF	pos3, f
 	ANDWF	pos4, f
 
-	
+	call	lookup				;initialise the lookup table
+	movlb	0				;select bank 0 so the access bank is used again
+	movf	pos1, W				;use the pressed button to obtain the data from bank6
+	call	write
+	movf	pos2, W	
+	call	write
+	movf	pos3, W	
+	call	write
+	movf	pos4, W	
+	call	write
+
 	goto $ ; Sit in infinite loop
 		
 read	movff	PORTD, read_pos
 	call	LCD_delay_ms
 	return
 
+write	
+	movff	PLUSW1, storage
+	movf	storage, W
+	call	delay
+	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
+	call	LCD_delay_ms
+	return
+	
+	
 lookup
 	movlb	6		    ;select bank 6
 	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
-	movlw	'green'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	movlw	'G'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	movwf	storage
+	movlw	0x00
+	movff	storage, PLUSW1
+	
+	movlw	'B'
 	movwf	storage
 	movlw	0x01
 	movff	storage, PLUSW1
 	
-	movlw	'blue'
+	
+	movlw	'Y'
 	movwf	storage
 	movlw	0x02
 	movff	storage, PLUSW1
 	
-	
-	movlw	'yellow'
+	movlw	'R'
 	movwf	storage
 	movlw	0x03
-	movff	storage, PLUSW1
-	
-	movlw	'red'
-	movwf	storage
-	movlw	0x04
 	movff	storage, PLUSW1
 	
 	
