@@ -48,16 +48,15 @@ check	setf	TRISE
 	ANDWF	pos2, f
 	ANDWF	pos3, f
 	ANDWF	pos4, f
-	clrf	TRISC
-	clrf	TRISH
-	movff	pos4, PORTC
-	movff	pos1, PORTH
+
 	
 	goto $ ; Sit in infinite loop
 		
 read	movff	PORTD, read_pos
 	call	LCD_delay_ms
 	return
+
+convert	
 	
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
