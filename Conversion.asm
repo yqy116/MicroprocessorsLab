@@ -1,4 +1,13 @@
 	    #include p18f87k22.inc
+	    
+extern  LCD_Setup, LCD_Write_Message, LCD_Send_Byte_D	
+global	conversion_1, merge	    
+	code
+	org 0x0
+	goto	conversion
+	
+	org 0x100		    ; Main code starts here at address 0x100    
+	
 high_16	    res 1
 low_16	    res	1
 eight	    res	1    
@@ -13,7 +22,7 @@ high_24	    res 1
 low_24	    res	1
 myArray	    0x40
 	    
-conversion  
+conversion_1  
 	    movlw   low(0x418A)
 	    movwf   low_16
 	    movlw   high(0x418A)
@@ -42,10 +51,19 @@ add_carry   movlw   0x00
 	    addwfc   temp_4, W
 	    
 
-merge	    lfsr    FSR1, myArray
-	    movwf   TBLPTRU	
-	    movff   temp_5, TBLPTRH
-	    movff   temp_1, TBLPTRL
+merge	    movf    temp_4, W
+	    call    LCD_Send_Byte_D
+	    movf    temp_5, W
+	    call    LCD_Send_Byte_D
+	    movf    temp_1, W
+	    call    LCD_Send_Byte_D
+	    
+	    return
+	    end
+;	    lfsr    FSR1, myArray
+;	    movwf   TBLPTRU	
+;	    movff   temp_5, TBLPTRH
+;	    movff   temp_1, TBLPTRL
 
 ;multiply    movf    constant1, W
 ;	    mulwf   eight
