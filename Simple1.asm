@@ -5,6 +5,8 @@ pos1	res 1
 pos2	res 1
 pos3	res 1
 pos4	res 1
+dig_1	res 1
+dig_2	res 1
 read_pos res 1
 storage	res 1
 	
@@ -32,24 +34,19 @@ check	setf	TRISE
 	CPFSEQ	PORTE
 	bra	check
 	;Start reading the values
-	call	read
-	movff	read_pos, pos1
-	call	read
-	movff	read_pos, pos2
-	call	read
+	call	fair
+	movff	dig_1, pos1
+	call	fair
+	movff	dig_1, pos2
+	call	fair
+	movff	dig_1, pos3
+	call	fair
+	movff	dig_1, pos4
 	
-	movff	read_pos, pos3
-	call	read
-	movff	read_pos, pos4
 	;stop interupt
 	movlw	b'00000000'
 	movwf	T0CON
-	;move value to W for mask
-	movlw	0x03
-	ANDWF	pos1, f
-	ANDWF	pos2, f
-	ANDWF	pos3, f
-	ANDWF	pos4, f
+
 
 	call	lookup				;initialise the lookup table
 	movlb	0				;select bank 0 so the access bank is used again
@@ -63,7 +60,21 @@ check	setf	TRISE
 	call	write
 
 	goto $ ; Sit in infinite loop
-		
+	
+fair	call	read
+	movff	read_pos, dig_2
+	call	read
+	movff	read_pos, dig_1
+	movlw	0x01 ;masking
+	ANDWF	dig_2, f
+	ANDWF	dig_1, f
+	movlw	0x02
+	MULWF	dig_2, W
+	movf	PRODL, W
+	ADDWF	dig_1, f
+	
+	return
+	
 read	movff	PORTD, read_pos
 	call	LCD_delay_ms
 	return
