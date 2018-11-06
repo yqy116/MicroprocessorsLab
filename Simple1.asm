@@ -30,7 +30,6 @@ start	clrf TRISD ; Set PORTD as all outputs
 	
 check	setf	TRISE
 	movlw	0xff
-	movwf	0x01
 	CPFSEQ	PORTE
 	bra	check
 	;Start reading the values
