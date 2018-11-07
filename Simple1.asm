@@ -1,5 +1,7 @@
     #include p18f87k22.inc
 extern	LCD_Setup, LCD_Write_Message, LCD_Write_Hex, LCD_Send_Byte_D ,LCD_delay_ms
+   
+
 acs0    udata_acs   ; named variables in access ram
 pos1	res 1
 pos2	res 1
@@ -41,88 +43,98 @@ start	clrf TRISD ; Set PORTD as all outputs
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
 	
-check	setf	TRISE
-	movlw	0xff
-	CPFSEQ	PORTE
-	bra	check
-	;Start reading the values
-	call	fair
-	movff	dig_1, pos1
-	call	fair
-	movff	dig_1, pos2
-	call	fair
-	movff	dig_1, pos3
-	call	fair
-	movff	dig_1, pos4
-	
-	;stop interupt
-	movlw	b'00000000'
-	movwf	T0CON
+;check	setf	TRISE
+;	movlw	0xff
+;	CPFSEQ	PORTE
+;	bra	check
+;	;Start reading the values
+;	call	fair
+;	movff	dig_1, pos1
+;	call	fair
+;	movff	dig_1, pos2
+;	call	fair
+;	movff	dig_1, pos3
+;	call	fair
+;	movff	dig_1, pos4
+;	
+;	;stop interupt
+;	movlw	b'00000000'
+;	movwf	T0CON
+;
+;
+;	call	lookup				;initialise the lookup table
+;	movlb	0				;select bank 0 so the access bank is used again
+;	movf	pos1, W				;use the pressed button to obtain the data from bank6
+;	call	write
+;	movf	pos2, W	
+;	call	write
+;	movf	pos3, W	
+;	call	write
+;	movf	pos4, W	
+;	call	write	
 
-
-	call	lookup				;initialise the lookup table
-	movlb	0				;select bank 0 so the access bank is used again
-	movf	pos1, W				;use the pressed button to obtain the data from bank6
-	call	write
-	movf	pos2, W	
-	call	write
-	movf	pos3, W	
-	call	write
-	movf	pos4, W	
-	call	write	
-
-
-	
 lag	call	keyboard
 	movlb	0
 	movlw	0xff
 	CPFSEQ	tempo
 	goto	game
 	bra     lag
-
-
+		
 	
 game	call	table				;initialise the lookup table
 	movlb	0				;select bank 0 so the access bank is used again
-	movf	PORTH, W			;use the pressed button to obtain the data from bank6
-	movff	PLUSW1, storage
-	movff	storage, ans1
-	call	delay
-	movf	ans1, W
-	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
-	call	LCD_delay_ms
+	movf	PORTH, W	
+	call	write
 	goto	lag
-;	goto $
-;	movff	W, ans1
-;	goto	lag
-;	movff	W, ans2
-;	goto	lag
-;	movff	W, ans3
-;	goto	lag
-;	movff	W, ans4
-;	goto	lag	
-	
+;	movf	PORTH, W			;use the pressed button to obtain the data from bank6
+;	movff	PLUSW1, storage
+;	movf	storage, W
+;	call	delay
+;	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
+;	call	LCD_delay_ms
 
+
+	
+	movff	W, ans1
+	goto	lag
+	movff	W, ans2
+	goto	lag
+	movff	W, ans3
+	goto	lag
+	movff	W, ans4
+	goto	lag	
+	
 	goto $ ; Sit in infinite loop
 
+table
+	movlb	6		    ;select bank 6
+	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
+	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	movwf	storage
+	movlw	0x77
+	movff	storage, PLUSW1
 	
-;keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
-;	movwf T1CON ; = 62.5KHz clock rate, approx 1sec rollover
-;	bsf PIE1,TMR1IE ; Enable timer0 interrupt
-;	bsf INTCON,GIE ; Enable all interrupts
-;	
-;	call	table				;initialise the lookup table
-;	movlb	0				;select bank 0 so the access bank is used again
-;	movf	ans1, W				;use the pressed button to obtain the data from bank6
-;	call	write
-;	movf	ans2, W	
-;	call	write
-;	movf	ans3, W	
-;	call	write
-;	movf	ans4, W	
-;	call	write	
+	movlw	'G'
+	movwf	storage
+	movlw	0xB7
+	movff	storage, PLUSW1
 	
 	
+	movlw	'B'
+	movwf	storage
+	movlw	0xD7
+	movff	storage, PLUSW1
+	
+	movlw	'Y'
+	movwf	storage
+	movlw	0xE7
+	movff	storage, PLUSW1
+	;for clear function
+;	movlw	'5'
+;	movwf	storage
+;	movlw	0xBB
+;	movff	storage, PLUSW1	
+	return
 	
 fair	call	read
 	movff	read_pos, dig_2
@@ -141,6 +153,8 @@ fair	call	read
 keyboard	;banksel cannot be same line with a label,etc.start
 	banksel PADCFG1				;enable pull-ups and all that for PORTE
 	bsf	PADCFG1,RJPU,BANKED
+	movlw	0xFF
+	movwf	0x01
 	;Start the row 
 	movlw	0x0F				;gets the row byte
 	movwf	TRISJ
@@ -170,7 +184,6 @@ read	movff	PORTD, read_pos
 write	
 	movff	PLUSW1, storage
 	movf	storage, W
-	call	delay
 	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
 	call	LCD_delay_ms
 	call	LCD_delay_ms
@@ -202,36 +215,7 @@ lookup
 	movff	storage, PLUSW1
 	return
 	
-table
-	movlb	6		    ;select bank 6
-	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
-	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
-	movwf	storage
-	movlw	0x77
-	movff	storage, PLUSW1
-	
-	movlw	'G'
-	movwf	storage
-	movlw	0xB7
-	movff	storage, PLUSW1
-	
-	
-	movlw	'B'
-	movwf	storage
-	movlw	0xD7
-	movff	storage, PLUSW1
-	
-	movlw	'Y'
-	movwf	storage
-	movlw	0xE7
-	movff	storage, PLUSW1
-	;for clear function
-;	movlw	'5'
-;	movwf	storage
-;	movlw	0xBB
-;	movff	storage, PLUSW1	
-	return
-	
+
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
 	return
