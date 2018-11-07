@@ -82,13 +82,23 @@ lag	call	keyboard
 game	call	table				;initialise the lookup table
 	movlb	0				;select bank 0 so the access bank is used again
 	movf	PORTH, W			;use the pressed button to obtain the data from bank6
-	movff	PLUSW1, storage
-	movff	storage, ans1
+	movff	PLUSW0, storage
+	movf	storage, W
 	call	delay
-	movf	ans1, W
 	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
-	CALL	LCD_delay_ms
-
+	call	LCD_delay_ms
+	
+	movff	W, ans1
+	goto	lag
+	movff	W, ans2
+	goto	lag
+	movff	W, ans3
+	goto	lag
+	movff	W, ans4
+	goto	lag	
+	
+	
+	
 ;keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 ;	movwf T1CON ; = 62.5KHz clock rate, approx 1sec rollover
 ;	bsf PIE1,TMR1IE ; Enable timer0 interrupt
@@ -162,56 +172,57 @@ write
 lookup
 	movlb	6		    ;select bank 6
 	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
-	movlw	'G'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
 	movwf	storage
 	movlw	0x00
 	movff	storage, PLUSW1
 	
-	movlw	'B'
+	movlw	'G'
 	movwf	storage
 	movlw	0x01
 	movff	storage, PLUSW1
 	
 	
-	movlw	'Y'
+	movlw	'B'
 	movwf	storage
 	movlw	0x02
 	movff	storage, PLUSW1
 	
-	movlw	'R'
+	movlw	'Y'
 	movwf	storage
 	movlw	0x03
 	movff	storage, PLUSW1
+	return
 	
 table
-	movlb	5		    ;select bank 6
-	lfsr	FSR1, 0x580	    ;point FSR1 to the middle of bank 6
+	movlb	6		    ;select bank 6
+	lfsr	FSR0, 0x680	    ;point FSR1 to the middle of bank 6
 	movlw	'G'		    ; load all of the ascii codes into locations +/- away from the FSR1
 	movwf	storage
 	movlw	0x77
-	movff	storage, PLUSW1
+	movff	storage, PLUSW0
 	
 	movlw	'B'
 	movwf	storage
 	movlw	0xB7
-	movff	storage, PLUSW1
+	movff	storage, PLUSW0
 	
 	
 	movlw	'Y'
 	movwf	storage
 	movlw	0xD7
-	movff	storage, PLUSW1
+	movff	storage, PLUSW0
 	
 	movlw	'R'
 	movwf	storage
 	movlw	0x7B
-	movff	storage, PLUSW1
+	movff	storage, PLUSW0
 	;for clear function
 ;	movlw	'5'
 ;	movwf	storage
 ;	movlw	0xBB
 ;	movff	storage, PLUSW1	
-	
+	return
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
 	return
