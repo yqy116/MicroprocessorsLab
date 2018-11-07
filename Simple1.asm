@@ -11,6 +11,7 @@ read_pos res 1
 storage	res 1
 number	res 1
 adder	res 1
+tempo	res 1	
 ans1	res 1
 ans2	res 1
 ans3	res 1
@@ -72,7 +73,12 @@ check	setf	TRISE
 	
 keyin	call	keyboard	
 	
-	
+
+check	;movlb	0
+	movlw	0xff
+	CPFSEQ	tempo
+	goto	write
+	call	keyboard	
 ;keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 ;	movwf T1CON ; = 62.5KHz clock rate, approx 1sec rollover
 ;	bsf PIE1,TMR1IE ; Enable timer0 interrupt
@@ -126,7 +132,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	iorwf	adder, W
 	clrf	TRISH
 	movwf	PORTH	
-	
+	movwf	tempo
 	
 read	movff	PORTD, read_pos
 	call	LCD_delay_ms
