@@ -79,6 +79,8 @@ fair	call	read
 	return
 
 keyboard	;banksel cannot be same line with a label,etc.start
+	banksel PADCFG1				;enable pull-ups and all that for PORTE
+	bsf	PADCFG1,RJPU,BANKED
 	;Start the row 
 	movlw	0x0F				;gets the row byte
 	movwf	TRISJ
