@@ -71,33 +71,40 @@ check	setf	TRISE
 	movf	pos4, W	
 	call	write	
 
+
+	
 lag	call	keyboard
 	movlb	0
 	movlw	0xff
 	CPFSEQ	tempo
 	goto	game
 	bra     lag
-		
+
+
 	
 game	call	table				;initialise the lookup table
 	movlb	0				;select bank 0 so the access bank is used again
 	movf	PORTH, W			;use the pressed button to obtain the data from bank6
-	movff	PLUSW0, storage
-	movf	storage, W
+	movff	PLUSW1, storage
+	movff	storage, ans1
 	call	delay
+	movf	ans1, W
 	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
 	call	LCD_delay_ms
-	
-	movff	W, ans1
 	goto	lag
-	movff	W, ans2
-	goto	lag
-	movff	W, ans3
-	goto	lag
-	movff	W, ans4
-	goto	lag	
+;	goto $
+;	movff	W, ans1
+;	goto	lag
+;	movff	W, ans2
+;	goto	lag
+;	movff	W, ans3
+;	goto	lag
+;	movff	W, ans4
+;	goto	lag	
 	
-	
+
+	goto $ ; Sit in infinite loop
+
 	
 ;keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 ;	movwf T1CON ; = 62.5KHz clock rate, approx 1sec rollover
@@ -113,8 +120,9 @@ game	call	table				;initialise the lookup table
 ;	movf	ans3, W	
 ;	call	write
 ;	movf	ans4, W	
-;	call	write
-	goto $ ; Sit in infinite loop
+;	call	write	
+	
+	
 	
 fair	call	read
 	movff	read_pos, dig_2
@@ -196,33 +204,34 @@ lookup
 	
 table
 	movlb	6		    ;select bank 6
-	lfsr	FSR0, 0x680	    ;point FSR1 to the middle of bank 6
-	movlw	'G'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
+	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
 	movwf	storage
 	movlw	0x77
-	movff	storage, PLUSW0
+	movff	storage, PLUSW1
+	
+	movlw	'G'
+	movwf	storage
+	movlw	0xB7
+	movff	storage, PLUSW1
+	
 	
 	movlw	'B'
 	movwf	storage
-	movlw	0xB7
-	movff	storage, PLUSW0
-	
+	movlw	0xD7
+	movff	storage, PLUSW1
 	
 	movlw	'Y'
 	movwf	storage
-	movlw	0xD7
-	movff	storage, PLUSW0
-	
-	movlw	'R'
-	movwf	storage
-	movlw	0x7B
-	movff	storage, PLUSW0
+	movlw	0xE7
+	movff	storage, PLUSW1
 	;for clear function
 ;	movlw	'5'
 ;	movwf	storage
 ;	movlw	0xBB
 ;	movff	storage, PLUSW1	
 	return
+	
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
 	return
