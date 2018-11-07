@@ -9,6 +9,7 @@ dig_1	res 1
 dig_2	res 1
 read_pos res 1
 storage	res 1
+number	res 1
 	
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -16,7 +17,7 @@ rst	code 0x0000 ; reset vector
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
 	retfie FAST ; if not then return
-	incf LATD ; increment PORTD
+	incf number ; increment PORTD
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
@@ -74,7 +75,7 @@ fair	call	read
 	
 	return
 	
-read	movff	PORTD, read_pos
+read	movff	number, read_pos
 	call	LCD_delay_ms
 	return
 
@@ -83,6 +84,7 @@ write
 	movf	storage, W
 	call	delay
 	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
+	call	LCD_delay_ms
 	call	LCD_delay_ms
 	return
 	
