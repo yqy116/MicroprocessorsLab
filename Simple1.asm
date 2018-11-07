@@ -69,16 +69,26 @@ check	setf	TRISE
 	movf	pos3, W	
 	call	write
 	movf	pos4, W	
-	call	write
-	
-keyin	call	keyboard	
-	
+	call	write	
 
-check	;movlb	0
+lag	call	keyboard
+	movlb	0
 	movlw	0xff
 	CPFSEQ	tempo
-	goto	write
-	call	keyboard	
+	goto	game
+	bra     lag
+		
+	
+game	call	table				;initialise the lookup table
+	movlb	0				;select bank 0 so the access bank is used again
+	movf	PORTH, W			;use the pressed button to obtain the data from bank6
+	movff	PLUSW1, storage
+	movff	storage, ans1
+	call	delay
+	movf	ans1, W
+	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
+	CALL	LCD_delay_ms
+
 ;keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 ;	movwf T1CON ; = 62.5KHz clock rate, approx 1sec rollover
 ;	bsf PIE1,TMR1IE ; Enable timer0 interrupt
@@ -133,6 +143,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	clrf	TRISH
 	movwf	PORTH	
 	movwf	tempo
+	return
 	
 read	movff	PORTD, read_pos
 	call	LCD_delay_ms
@@ -173,8 +184,8 @@ lookup
 	movff	storage, PLUSW1
 	
 table
-	movlb	6		    ;select bank 6
-	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
+	movlb	5		    ;select bank 6
+	lfsr	FSR1, 0x580	    ;point FSR1 to the middle of bank 6
 	movlw	'G'		    ; load all of the ascii codes into locations +/- away from the FSR1
 	movwf	storage
 	movlw	0x77
