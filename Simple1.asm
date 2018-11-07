@@ -18,7 +18,7 @@ ans1	res 1
 ans2	res 1
 ans3	res 1
 ans4	res 1
-	
+ 
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
 	goto start
@@ -74,37 +74,46 @@ start	clrf TRISD ; Set PORTD as all outputs
 ;	call	write	
 
 lag	call	keyboard
-	movlb	0
 	movlw	0xff
 	CPFSEQ	tempo
 	goto	game
-	bra     lag
+	goto     lag	
 		
 	
-game	call	table				;initialise the lookup table
-	movlb	0				;select bank 0 so the access bank is used again
-	movf	PORTH, W	
-	call	write
-	goto	lag
-;	movf	PORTH, W			;use the pressed button to obtain the data from bank6
+game	call	lag
+	movlw	ans1
+	call	LCD_delay_ms
+	call	LCD_delay_ms	
+	call	lag
+	movlw	ans2
+	call	LCD_delay_ms
+	call	LCD_delay_ms	
+	call	lag
+	movlw	ans3
+	call	LCD_delay_ms
+	call	LCD_delay_ms	
+	call	lag
+	movlw	ans4
+	call	LCD_delay_ms
+	call	LCD_delay_ms	
+
+	goto	$
+	
+
+	
+;game	call	table				;initialise the lookup table
+;	movlb	0				;select bank 0 so the access bank is used again
+;	movf	PORTH, W	
 ;	movff	PLUSW1, storage
 ;	movf	storage, W
 ;	call	delay
+;
 ;	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
-;	call	LCD_delay_ms
+;	CALL	LCD_delay_ms
+;
+;	
+;	goto $ ; Sit in infinite loop
 
-
-	
-	movff	W, ans1
-	goto	lag
-	movff	W, ans2
-	goto	lag
-	movff	W, ans3
-	goto	lag
-	movff	W, ans4
-	goto	lag	
-	
-	goto $ ; Sit in infinite loop
 
 table
 	movlb	6		    ;select bank 6
@@ -212,6 +221,28 @@ lookup
 	movlw	'Y'
 	movwf	storage
 	movlw	0x03
+	movff	storage, PLUSW1
+	
+	;keyin table
+	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	movwf	storage
+	movlw	0x77
+	movff	storage, PLUSW1
+	
+	movlw	'G'
+	movwf	storage
+	movlw	0xB7
+	movff	storage, PLUSW1
+	
+	
+	movlw	'B'
+	movwf	storage
+	movlw	0xD7
+	movff	storage, PLUSW1
+	
+	movlw	'Y'
+	movwf	storage
+	movlw	0xE7
 	movff	storage, PLUSW1
 	return
 	
