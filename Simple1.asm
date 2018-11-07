@@ -10,6 +10,7 @@ dig_2	res 1
 read_pos res 1
 storage	res 1
 number	res 1
+adder	res 1
 	
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -58,7 +59,9 @@ check	setf	TRISE
 	call	write
 	movf	pos4, W	
 	call	write
-
+	
+keyin	call	keyboard
+	bra	keyin
 	goto $ ; Sit in infinite loop
 	
 fair	call	read
@@ -74,6 +77,28 @@ fair	call	read
 	ADDWF	dig_1, f
 	
 	return
+
+keyboard	;banksel cannot be same line with a label,etc.start
+	;Start the row 
+	movlw	0x0F				;gets the row byte
+	movwf	TRISJ
+	call	delay
+	movwf	PORTJ
+	call	delay
+	movf	PORTJ, W, ACCESS
+	movwf   adder
+	;Start the column			;gets the column byte
+	call	delay
+	movlw	0xF0
+	movwf	TRISJ
+	call	delay
+	movwf	PORTJ
+	call	delay
+	movf	PORTJ, W, ACCESS		;combine the row and column binary stuff and output it to portD
+	iorwf	adder, W
+	clrf	TRISH
+	movwf	PORTH	
+	
 	
 read	movff	number, read_pos
 	call	LCD_delay_ms
