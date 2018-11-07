@@ -11,6 +11,10 @@ read_pos res 1
 storage	res 1
 number	res 1
 adder	res 1
+ans1	res 1
+ans2	res 1
+ans3	res 1
+ans4	res 1
 	
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -18,10 +22,16 @@ rst	code 0x0000 ; reset vector
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
 	retfie FAST ; if not then return
-	incf number ; increment PORTD
+	;bra   scd_int
+	incf LATD ; increment PORTD
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
+;scd_int	btfss PIE1,TMR1IE; check that this is timer1 interrupt
+;	retfie FAST ; if not then return
+;	call	keyboard
+;	retfie FAST
+	
 main	code
 start	clrf TRISD ; Set PORTD as all outputs
 	clrf LATD ; Clear PORTD outputs
@@ -60,8 +70,24 @@ check	setf	TRISE
 	movf	pos4, W	
 	call	write
 	
-keyin	call	keyboard
-	bra	keyin
+keyin	call	keyboard	
+	
+	
+;keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
+;	movwf T1CON ; = 62.5KHz clock rate, approx 1sec rollover
+;	bsf PIE1,TMR1IE ; Enable timer0 interrupt
+;	bsf INTCON,GIE ; Enable all interrupts
+;	
+;	call	table				;initialise the lookup table
+;	movlb	0				;select bank 0 so the access bank is used again
+;	movf	ans1, W				;use the pressed button to obtain the data from bank6
+;	call	write
+;	movf	ans2, W	
+;	call	write
+;	movf	ans3, W	
+;	call	write
+;	movf	ans4, W	
+;	call	write
 	goto $ ; Sit in infinite loop
 	
 fair	call	read
@@ -102,7 +128,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	movwf	PORTH	
 	
 	
-read	movff	number, read_pos
+read	movff	PORTD, read_pos
 	call	LCD_delay_ms
 	return
 
@@ -140,7 +166,34 @@ lookup
 	movlw	0x03
 	movff	storage, PLUSW1
 	
+table
+	movlb	6		    ;select bank 6
+	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
+	movlw	'G'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	movwf	storage
+	movlw	0x77
+	movff	storage, PLUSW1
 	
+	movlw	'B'
+	movwf	storage
+	movlw	0xB7
+	movff	storage, PLUSW1
+	
+	
+	movlw	'Y'
+	movwf	storage
+	movlw	0xD7
+	movff	storage, PLUSW1
+	
+	movlw	'R'
+	movwf	storage
+	movlw	0x7B
+	movff	storage, PLUSW1
+	;for clear function
+;	movlw	'5'
+;	movwf	storage
+;	movlw	0xBB
+;	movff	storage, PLUSW1	
 	
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
