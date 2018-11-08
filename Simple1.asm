@@ -22,6 +22,7 @@ myArray res 4 ;save answer
 counter res 1 ;count answer
 dumpster res 1
 temp_ans  res 1
+myinitial res 4;save initial values
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -61,23 +62,28 @@ check	setf	TRISE
 	movff	dig_1, pos3
 	call	fair
 	movff	dig_1, pos4
-	
+
 	;stop interupt
 	movlw	b'00000000'
 	movwf	T0CON
 
-
+	lfsr    FSR2, myinitial
 	call	lookup				;initialise the lookup table
 	movlb	0				;select bank 0 so the access bank is used again
 	movf	pos1, W				;use the pressed button to obtain the data from bank6
 	call	write
+	movwf	POSTINC2
 	movf	pos2, W	
 	call	write
+	movwf	POSTINC2
 	movf	pos3, W	
 	call	write
+	movwf	POSTINC2
 	movf	pos4, W	
 	call	write	
+	movwf	POSTINC2
 
+	
 keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
@@ -101,6 +107,10 @@ answ	movf	tempo, W
 	movwf	counter
 	call	LCD_Clear
 	lfsr    FSR0, myArray 
+	lfsr    FSR2, myinitial
+snip	movf	POSTINC2, W 
+	call	LCD_Send_Byte_D	
+	goto	snip
 testtest	
 	call	validate
 	movf	POSTINC0, W 
@@ -113,7 +123,7 @@ validate
 	movff	PLUSW1, storage
 	movf	storage, W
 	movwf	temp_ans
-	movf	pos1, W				;use the pressed button to obtain the data from bank6
+	movf	POSTINC2, W 			;use the pressed button to obtain the data from bank6
 	movff	PLUSW1, storage
 	movf	storage, W
 	CPFSEQ	temp_ans
