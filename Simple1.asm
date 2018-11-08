@@ -72,16 +72,12 @@ check	setf	TRISE
 	movlb	0				;select bank 0 so the access bank is used again
 	movf	pos1, W				;use the pressed button to obtain the data from bank6
 	call	write
-	movwf	POSTINC2
 	movf	pos2, W	
 	call	write
-	movwf	POSTINC2
 	movf	pos3, W	
 	call	write
-	movwf	POSTINC2
 	movf	pos4, W	
 	call	write	
-	movwf	POSTINC2
 
 	
 keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
