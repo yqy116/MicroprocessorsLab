@@ -21,7 +21,8 @@ dumpster res 1
 temp_ans  res 1
 myinitial res 4;save initial values
 pos_counter res 1   ;the position 
-ans_pos	res 1
+ans_pos	res 1	    ;key in position
+ran_pos	res 1	    ;rsequence position
 
  
  
@@ -104,6 +105,10 @@ answ	movf	tempo, W
 	decfsz  counter
 	goto	loop
 	
+	;All kind of initialization
+	movlw	0x00
+	movwf	ran_pos
+	movwf	ans_pos
 	movlw	0x04
 	movwf	pos_counter
 	call	LCD_Clear
@@ -111,13 +116,18 @@ answ	movf	tempo, W
 	call	LCD_delay_ms
 	lfsr    FSR2, myinitial
 	
-	;loop for position
+	;loop for position, initialise value that refresh
 pos_chk	lfsr    FSR0, myArray 
+	movlw	0x01
+	movwf	ran_pos
+	addwf	ans_pos	;refreh position
 	movlw	0x04
 	movwf	counter
 	
 testtest	
 	call	validate
+	movlw	0x01
+	addwf	ran_pos
 	decfsz  counter 
 	goto	testtest
 	movf	POSTINC2, W 	;initial sequence
@@ -125,7 +135,7 @@ testtest
 	goto	pos_chk
 	goto	$
 	
-;EVERYTHIN HERE ONWARDS IS SUBROUTINE
+;EVERYTHING HERE ONWARDS IS SUBROUTINE
 validate
 	movf	POSTINC0, W	;key in answer
 	movff	PLUSW1, storage
@@ -142,16 +152,30 @@ validate
 	return
 	call	correct	
 	return
+
+;correct	movlw	'Y'
+;	call	LCD_Send_Byte_D	
+;	return
 	
-correct	movlw	'Y'
-	call	LCD_Send_Byte_D	
-	call	LCD_delay_ms
-	call	LCD_delay_ms
+correct	movf	ans_pos, W
+	CPFSEQ	ran_pos
+	call	wro_pos
+	CPFSEQ	ran_pos
 	return
+	call	cor_pos
+	return
+	
+cor_pos	movlw	'Y'
+	call	LCD_Send_Byte_D	
+	return
+	
+wro_pos movlw	'Z'
+	call	LCD_Send_Byte_D	
+	return
+	
 wrong	movlw	'N'
 	call	LCD_Send_Byte_D	
-	call	LCD_delay_ms
-	call	LCD_delay_ms
+	
 	return
 	
 ;CORRECT CODE
