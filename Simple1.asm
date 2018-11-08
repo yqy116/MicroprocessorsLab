@@ -27,6 +27,7 @@ int_hi	code 0x0008 ; high vector, no low vector
 	retfie FAST ; if not then return
 	;bra   scd_int
 	incf LATD ; increment PORTD
+	call	keyboard
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
@@ -43,62 +44,60 @@ start	clrf TRISD ; Set PORTD as all outputs
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
 	
-;check	setf	TRISE
-;	movlw	0xff
-;	CPFSEQ	PORTE
-;	bra	check
-;	;Start reading the values
-;	call	fair
-;	movff	dig_1, pos1
-;	call	fair
-;	movff	dig_1, pos2
-;	call	fair
-;	movff	dig_1, pos3
-;	call	fair
-;	movff	dig_1, pos4
-;	
-;	;stop interupt
-;	movlw	b'00000000'
-;	movwf	T0CON
-;
-;
-;	call	lookup				;initialise the lookup table
-;	movlb	0				;select bank 0 so the access bank is used again
-;	movf	pos1, W				;use the pressed button to obtain the data from bank6
-;	call	write
-;	movf	pos2, W	
-;	call	write
-;	movf	pos3, W	
-;	call	write
-;	movf	pos4, W	
-;	call	write	
-
-lag	call	keyboard
+check	setf	TRISE
 	movlw	0xff
-	CPFSEQ	tempo
-	goto	game
-	goto     lag	
-		
+	CPFSEQ	PORTE
+	bra	check
+	;Start reading the values
+	call	fair
+	movff	dig_1, pos1
+	call	fair
+	movff	dig_1, pos2
+	call	fair
+	movff	dig_1, pos3
+	call	fair
+	movff	dig_1, pos4
 	
-game	call	lag
-	movlw	ans1
-	call	LCD_delay_ms
-	call	LCD_delay_ms	
-	call	lag
-	movlw	ans2
-	call	LCD_delay_ms
-	call	LCD_delay_ms	
-	call	lag
-	movlw	ans3
-	call	LCD_delay_ms
-	call	LCD_delay_ms	
-	call	lag
-	movlw	ans4
-	call	LCD_delay_ms
-	call	LCD_delay_ms	
+	;stop interupt
+	movlw	b'00000000'
+	movwf	T0CON
 
-	goto	$
-	
+
+	call	lookup				;initialise the lookup table
+	movlb	0				;select bank 0 so the access bank is used again
+	movf	pos1, W				;use the pressed button to obtain the data from bank6
+	call	write
+	movf	pos2, W	
+	call	write
+	movf	pos3, W	
+	call	write
+	movf	pos4, W	
+	call	write	
+
+keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
+	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
+	bsf INTCON,TMR0IE ; Enable timer0 interrupt
+	bsf INTCON,GIE ; Enable all interrupts
+loop	movlw	0xff
+	CPFSEQ	tempo
+	goto	answ
+	goto	loop
+answ	movf	tempo, W
+	call	write
+	goto	loop
+;lag	call	keyboard
+;	movlw	0xff
+;	CPFSEQ	tempo
+;	goto	lag
+;	goto    lag	
+;		
+;	
+;game	movlb	0
+;	movff	PORTH, ans1
+;	movf	PORTH, W
+;	call	write
+;	goto	$
+;	
 
 	
 ;game	call	table				;initialise the lookup table
