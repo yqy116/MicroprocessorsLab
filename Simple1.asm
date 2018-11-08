@@ -71,12 +71,16 @@ check	setf	TRISE
 	call	lookup				;initialise the lookup table
 	movlb	0				;select bank 0 so the access bank is used again
 	movf	pos1, W				;use the pressed button to obtain the data from bank6
+	movwf	POSTINC2
 	call	write
 	movf	pos2, W	
+	movwf	POSTINC2
 	call	write
 	movf	pos3, W	
+	movwf	POSTINC2
 	call	write
 	movf	pos4, W	
+	movwf	POSTINC2
 	call	write	
 
 	
@@ -104,42 +108,43 @@ answ	movf	tempo, W
 	call	LCD_Clear
 	lfsr    FSR0, myArray 
 	lfsr    FSR2, myinitial
-snip	movf	POSTINC2, W 
-	call	LCD_Send_Byte_D	
-	goto	snip
-testtest	
-	call	validate
-	movf	POSTINC0, W 
-	decfsz  counter 
-	goto	testtest
 	goto	$
-
-
-validate
-	movff	PLUSW1, storage
-	movf	storage, W
-	movwf	temp_ans
-	movf	POSTINC2, W 			;use the pressed button to obtain the data from bank6
-	movff	PLUSW1, storage
-	movf	storage, W
-	CPFSEQ	temp_ans
-	call	wrong
-	CPFSEQ	temp_ans
-	return
-	call	correct	
-	return
-
-correct	movlw	'Y'
-	call	LCD_Send_Byte_D	
-	call	LCD_delay_ms
-	call	LCD_delay_ms
-	return
-wrong	movlw	'N'
-	call	LCD_Send_Byte_D	
-	call	LCD_delay_ms
-	call	LCD_delay_ms
-	return
 	
+;testtest	
+;	call	validate
+;	movf	POSTINC0, W 
+;	decfsz  counter 
+;	goto	testtest
+;	goto	$
+
+;
+;validate
+;	movff	PLUSW1, storage
+;	movf	storage, W
+;	movwf	temp_ans	
+;	;call	LCD_Send_Byte_D	
+;	movf	POSTINC2, W 			;use the pressed button to obtain the data from bank6
+;	movff	PLUSW1, storage
+;	movf	storage, W
+;	call	LCD_Send_Byte_D	
+;	CPFSEQ	temp_ans
+;	call	wrong
+;	CPFSEQ	temp_ans
+;	return
+;	call	correct	
+;	return
+;
+;correct	movlw	'Y'
+;	;call	LCD_Send_Byte_D	
+;	call	LCD_delay_ms
+;	call	LCD_delay_ms
+;	return
+;wrong	movlw	'N'
+;	;call	LCD_Send_Byte_D	
+;	call	LCD_delay_ms
+;	call	LCD_delay_ms
+;	return
+;	
 	
 fair	call	read
 	movff	read_pos, dig_2
