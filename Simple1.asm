@@ -85,33 +85,6 @@ loop	movlw	0xff
 answ	movf	tempo, W
 	call	write
 	goto	loop
-;lag	call	keyboard
-;	movlw	0xff
-;	CPFSEQ	tempo
-;	goto	lag
-;	goto    lag	
-;		
-;	
-;game	movlb	0
-;	movff	PORTH, ans1
-;	movf	PORTH, W
-;	call	write
-;	goto	$
-;	
-
-	
-;game	call	table				;initialise the lookup table
-;	movlb	0				;select bank 0 so the access bank is used again
-;	movf	PORTH, W	
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	call	delay
-;
-;	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
-;	CALL	LCD_delay_ms
-;
-;	
-;	goto $ ; Sit in infinite loop
 
 
 table
