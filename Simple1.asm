@@ -1,5 +1,6 @@
-    #include p18f87k22.inc
-extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear
+#include p18f87k22.inc
+
+	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear
    
 
 acs0    udata_acs   ; named variables in access ram
@@ -103,48 +104,49 @@ answ	movf	tempo, W
 	decfsz  counter
 	goto	loop
 	
-	movlw	0x05
+	movlw	0x04
 	movwf	counter
 	call	LCD_Clear
+	movlw	.5	    ;Need some time before it clear
+	call	LCD_delay_ms
 	lfsr    FSR0, myArray 
 	lfsr    FSR2, myinitial
-	goto	$
-	
-;testtest	
-;	call	validate
-;	movf	POSTINC0, W 
-;	decfsz  counter 
-;	goto	testtest
-;	goto	$
 
-;
-;validate
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	movwf	temp_ans	
-;	;call	LCD_Send_Byte_D	
-;	movf	POSTINC2, W 			;use the pressed button to obtain the data from bank6
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	call	LCD_Send_Byte_D	
-;	CPFSEQ	temp_ans
-;	call	wrong
-;	CPFSEQ	temp_ans
-;	return
-;	call	correct	
-;	return
-;
-;correct	movlw	'Y'
-;	;call	LCD_Send_Byte_D	
-;	call	LCD_delay_ms
-;	call	LCD_delay_ms
-;	return
-;wrong	movlw	'N'
-;	;call	LCD_Send_Byte_D	
-;	call	LCD_delay_ms
-;	call	LCD_delay_ms
-;	return
-;	
+	
+testtest	
+	call	validate
+	decfsz  counter 
+	goto	testtest
+	goto	$
+
+
+validate
+	movf	POSTINC0, W 
+	movff	PLUSW1, storage
+	movf	storage, W
+	movwf	temp_ans	
+	;call	LCD_Send_Byte_D	
+	movf	POSTINC2, W 			;use the pressed button to obtain the data from bank6
+	movff	PLUSW1, storage
+	movf	storage, W
+	;call	LCD_Send_Byte_D	
+	CPFSEQ	temp_ans
+	call	wrong
+	CPFSEQ	temp_ans
+	return
+	call	correct	
+	return
+
+correct	movlw	'Y'
+	call	LCD_Send_Byte_D	
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	return
+wrong	movlw	'N'
+	call	LCD_Send_Byte_D	
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	return
 	
 fair	call	read
 	movff	read_pos, dig_2
