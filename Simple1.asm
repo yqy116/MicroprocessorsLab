@@ -18,6 +18,7 @@ ans1	res 1
 ans2	res 1
 ans3	res 1
 ans4	res 1
+myArray res 0x00 
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -78,11 +79,13 @@ keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
+	lfsr fsr0, myArray 
 loop	movlw	0xff
 	CPFSEQ	tempo
 	goto	answ
 	goto	loop
 answ	movf	tempo, W
+	movff	tempo
 	call	write
 	goto	loop
 
