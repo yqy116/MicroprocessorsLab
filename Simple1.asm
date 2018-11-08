@@ -57,20 +57,12 @@ check	setf	TRISE
 	;Start reading the values
 	call	fair
 	movff	dig_1, pos1
-;	movf	pos1, W
-;	call	write
 	call	fair
 	movff	dig_1, pos2
-;	movf	pos2, W
-;	call	write
 	call	fair
 	movff	dig_1, pos3
-;	movf	pos3, W
-;	call	write
 	call	fair
 	movff	dig_1, pos4
-;	movf	pos4, W
-;	call	write
 
 
 	;stop interupt
@@ -87,48 +79,36 @@ check	setf	TRISE
 	movf	pos4, W
 	call	write
 	
-;	lfsr    FSR2, myinitial
-;	call	lookup				;initialise the lookup table
-;	movlb	0				;select bank 0 so the access bank is used again
-;	movf	pos1, W				;use the pressed button to obtain the data from bank6
-;	movwf	POSTINC2
-;	call	write
-;	movf	pos2, W	
-;	movwf	POSTINC2
-;	call	write
-;	movf	pos3, W	
-;	movwf	POSTINC2
-;	call	write
-;	movf	pos4, W	
-;	movwf	POSTINC2
-;	call	write	
-;
-;	
-;keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
-;	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
-;	bsf INTCON,TMR0IE ; Enable timer0 interrupt
-;	bsf INTCON,GIE ; Enable all interrupts
-;	lfsr FSR0, myArray 
-;	movlw	0x04
-;	movwf	counter
-;	
-;loop	movlw	0xff
-;	CPFSEQ	tempo
-;	goto	answ
-;	goto	loop
-;	
-;answ	movlw	0x11
-;	movff	PLUSW1,storage2
-;	movf	storage2, W
-;	call	LCD_Send_Byte_D
-;	CPFSEQ	tempo
-;	call	wrong
-;	call	correct
-;	call	keyboard
 	
+keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
+	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
+	bsf INTCON,TMR0IE ; Enable timer0 interrupt
+	bsf INTCON,GIE ; Enable all interrupts
+	lfsr FSR0, myArray 
+	movlw	0x04
+	movwf	counter
 	
+loop	movlw	0xff
+	CPFSEQ	tempo
+	goto	answ
+	goto	loop
 	
+answ	
+	call	lookup
+	call	pos_stor
+	movf	tempo, W
+	movff	PLUSW1, storage
+	movf	storage, W
+	call	LCD_Send_Byte_D
+	movwf	storage
 	
+	movlw	0x11
+	movff	PLUSW1, storage2
+	movf	storage2, W
+	call	LCD_Send_Byte_D
+	CPFSEQ	storage
+	call	wrong
+	call	correct
 	
 	
 	
@@ -140,13 +120,13 @@ check	setf	TRISE
 ;
 
 ;
-correct	movlw	'Y'
-	;call	LCD_Send_Byte_D	
+correct	movlw	'1'
+	call	LCD_Send_Byte_D	
 	call	LCD_delay_ms
 	call	LCD_delay_ms
 	return
-wrong	movlw	'N'
-	;call	LCD_Send_Byte_D	
+wrong	movlw	'0'
+	call	LCD_Send_Byte_D	
 	call	LCD_delay_ms
 	call	LCD_delay_ms
 	return
@@ -205,7 +185,30 @@ write
 	call	LCD_delay_ms
 	return
 	
+pos_stor    
+	movlb   6
+	lfsr	FSR1, 0x680
+	movf	pos1, W
+	movff	PLUSW1, storage
+	movlw	0x11
+	movff	storage, PLUSW1
 	
+	movf	pos2, W
+	movff	PLUSW1, storage
+	movlw	0x12
+	movff	storage, PLUSW1
+	
+	movf	pos3, W
+	movff	PLUSW1, storage
+	movlw	0x13
+	movff	storage, PLUSW1
+	
+	movf	pos4, W
+	movff	PLUSW1, storage
+	movlw	0x14
+	movff	storage, PLUSW1
+	
+	return
 lookup
 	movlb	6		    ;select bank 6
 	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
@@ -253,27 +256,6 @@ lookup
 	movlw	0xE7
 	movff	storage, PLUSW1
 	
-;	
-;	movlw	0x00		    ; load all of the ascii codes into locations +/- away from the FSR1
-;	movwf	storage
-;	movlw	0x77
-;	movff	storage, PLUSW1
-;	
-;	movlw	0x01
-;	movwf	storage
-;	movlw	0xB7
-;	movff	storage, PLUSW1
-;	
-;	
-;	movlw	0x02
-;	movwf	storage
-;	movlw	0xD7
-;	movff	storage, PLUSW1
-;	
-;	movlw	0x03
-;	movwf	storage
-;	movlw	0xE7
-;	movff	storage, PLUSW1
 	
 	return
 
