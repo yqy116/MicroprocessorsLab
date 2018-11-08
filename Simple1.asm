@@ -1,11 +1,11 @@
     #include p18f87k22.inc
-extern	LCD_Setup, LCD_Write_Message, LCD_Write_Hex, LCD_Send_Byte_D ,LCD_delay_ms
+extern	LCD_Setup, LCD_Write_Message, LCD_Write_Hex, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear
    
 
 acs0    udata_acs   ; named variables in access ram
-pos1	res 1
-pos2	res 1
-pos3	res 1
+pos1	res 1 ;first position for squence of colour
+pos2	res 1 ;second position for squence of colour
+pos3	res 1 ;so on
 pos4	res 1
 dig_1	res 1
 dig_2	res 1
@@ -18,7 +18,9 @@ ans1	res 1
 ans2	res 1
 ans3	res 1
 ans4	res 1
-myArray res 0x00 
+myArray res 4 ;save answer
+counter res 1 ;count answer
+dumpster res 1
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -79,46 +81,32 @@ keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
-	lfsr fsr0, myArray 
+	lfsr FSR0, myArray 
+	movlw	0x04
+	movwf	counter
+	
 loop	movlw	0xff
 	CPFSEQ	tempo
 	goto	answ
 	goto	loop
 answ	movf	tempo, W
-	movff	tempo
+	movff	tempo, POSTINC0
 	call	write
+	decfsz  counter
 	goto	loop
+	
+	movlw	0x05
+	movwf	counter
+	call	LCD_Clear
+	lfsr    FSR0, myArray 
+testtest	
+	call	write
+	movf	POSTINC0, W 
+	decfsz  counter 
+	goto	testtest
+	goto	$
 
 
-table
-	movlb	6		    ;select bank 6
-	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
-	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
-	movwf	storage
-	movlw	0x77
-	movff	storage, PLUSW1
-	
-	movlw	'G'
-	movwf	storage
-	movlw	0xB7
-	movff	storage, PLUSW1
-	
-	
-	movlw	'B'
-	movwf	storage
-	movlw	0xD7
-	movff	storage, PLUSW1
-	
-	movlw	'Y'
-	movwf	storage
-	movlw	0xE7
-	movff	storage, PLUSW1
-	;for clear function
-;	movlw	'5'
-;	movwf	storage
-;	movlw	0xBB
-;	movff	storage, PLUSW1	
-	return
 	
 fair	call	read
 	movff	read_pos, dig_2
@@ -220,7 +208,36 @@ lookup
 	movlw	0xE7
 	movff	storage, PLUSW1
 	return
+
+table
+	movlb	6		    ;select bank 6
+	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
+	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
+	movwf	storage
+	movlw	0x77
+	movff	storage, PLUSW1
 	
+	movlw	'G'
+	movwf	storage
+	movlw	0xB7
+	movff	storage, PLUSW1
+	
+	
+	movlw	'B'
+	movwf	storage
+	movlw	0xD7
+	movff	storage, PLUSW1
+	
+	movlw	'Y'
+	movwf	storage
+	movlw	0xE7
+	movff	storage, PLUSW1
+	;for clear function
+;	movlw	'5'
+;	movwf	storage
+;	movlw	0xBB
+;	movff	storage, PLUSW1	
+	return	
 
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
