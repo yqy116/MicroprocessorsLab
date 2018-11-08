@@ -13,7 +13,8 @@ read_pos res 1
 storage	res 1
 number	res 1
 adder	res 1
-tempo	res 1	
+tempo	res 1
+storage2 res 1
 ans1	res 1
 ans2	res 1
 ans3	res 1
@@ -56,94 +57,99 @@ check	setf	TRISE
 	;Start reading the values
 	call	fair
 	movff	dig_1, pos1
+;	movf	pos1, W
+;	call	write
 	call	fair
 	movff	dig_1, pos2
+;	movf	pos2, W
+;	call	write
 	call	fair
 	movff	dig_1, pos3
+;	movf	pos3, W
+;	call	write
 	call	fair
 	movff	dig_1, pos4
+;	movf	pos4, W
+;	call	write
+
 
 	;stop interupt
 	movlw	b'00000000'
 	movwf	T0CON
+	call	lookup
+	movlb	0
+	movf	pos1, W
+	call	write
+	movf	pos2, W
+	call	write
+	movf	pos3, W
+	call	write
+	movf	pos4, W
+	call	write
+	
+;	lfsr    FSR2, myinitial
+;	call	lookup				;initialise the lookup table
+;	movlb	0				;select bank 0 so the access bank is used again
+;	movf	pos1, W				;use the pressed button to obtain the data from bank6
+;	movwf	POSTINC2
+;	call	write
+;	movf	pos2, W	
+;	movwf	POSTINC2
+;	call	write
+;	movf	pos3, W	
+;	movwf	POSTINC2
+;	call	write
+;	movf	pos4, W	
+;	movwf	POSTINC2
+;	call	write	
+;
+;	
+;keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
+;	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
+;	bsf INTCON,TMR0IE ; Enable timer0 interrupt
+;	bsf INTCON,GIE ; Enable all interrupts
+;	lfsr FSR0, myArray 
+;	movlw	0x04
+;	movwf	counter
+;	
+;loop	movlw	0xff
+;	CPFSEQ	tempo
+;	goto	answ
+;	goto	loop
+;	
+;answ	movlw	0x11
+;	movff	PLUSW1,storage2
+;	movf	storage2, W
+;	call	LCD_Send_Byte_D
+;	CPFSEQ	tempo
+;	call	wrong
+;	call	correct
+;	call	keyboard
+	
+	
+	
+	
+	
+	
+	
 
-	lfsr    FSR2, myinitial
-	call	lookup				;initialise the lookup table
-	movlb	0				;select bank 0 so the access bank is used again
-	movf	pos1, W				;use the pressed button to obtain the data from bank6
-	movwf	POSTINC2
-	call	write
-	movf	pos2, W	
-	movwf	POSTINC2
-	call	write
-	movf	pos3, W	
-	movwf	POSTINC2
-	call	write
-	movf	pos4, W	
-	movwf	POSTINC2
-	call	write	
-
-	
-keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
-	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
-	bsf INTCON,TMR0IE ; Enable timer0 interrupt
-	bsf INTCON,GIE ; Enable all interrupts
-	lfsr FSR0, myArray 
-	movlw	0x04
-	movwf	counter
-	
-loop	movlw	0xff
-	CPFSEQ	tempo
-	goto	answ
-	goto	loop
-	
-answ	movf	tempo, W
-	movff	tempo, POSTINC0
-	call	write
-	decfsz  counter
-	goto	loop
-	
-	movlw	0x05
-	movwf	counter
-	call	LCD_Clear
-	lfsr    FSR0, myArray 
-	lfsr    FSR2, myinitial
 	goto	$
 	
-;testtest	
-;	call	validate
-;	movf	POSTINC0, W 
-;	decfsz  counter 
-;	goto	testtest
-;	goto	$
+
 
 ;
-;validate
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	movwf	temp_ans	
-;	;call	LCD_Send_Byte_D	
-;	movf	POSTINC2, W 			;use the pressed button to obtain the data from bank6
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	call	LCD_Send_Byte_D	
-;	CPFSEQ	temp_ans
-;	call	wrong
-;	CPFSEQ	temp_ans
-;	return
-;	call	correct	
-;	return
+
 ;
-;correct	movlw	'Y'
-;	;call	LCD_Send_Byte_D	
-;	call	LCD_delay_ms
-;	call	LCD_delay_ms
-;	return
-;wrong	movlw	'N'
-;	;call	LCD_Send_Byte_D	
-;	call	LCD_delay_ms
-;	call	LCD_delay_ms
-;	return
+correct	movlw	'Y'
+	;call	LCD_Send_Byte_D	
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	return
+wrong	movlw	'N'
+	;call	LCD_Send_Byte_D	
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	return
 ;	
 	
 fair	call	read
@@ -222,6 +228,8 @@ lookup
 	movwf	storage
 	movlw	0x03
 	movff	storage, PLUSW1
+	
+	
 	
 	;keyin table
 	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
