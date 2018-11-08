@@ -15,15 +15,15 @@ storage	res 1
 number	res 1
 adder	res 1
 tempo	res 1	
-ans1	res 1
-ans2	res 1
-ans3	res 1
-ans4	res 1
 myArray res 4 ;save answer
 counter res 1 ;count answer
 dumpster res 1
 temp_ans  res 1
 myinitial res 4;save initial values
+pos_counter res 1   ;the position 
+ans_pos	res 1
+
+ 
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -105,38 +105,44 @@ answ	movf	tempo, W
 	goto	loop
 	
 	movlw	0x04
-	movwf	counter
+	movwf	pos_counter
 	call	LCD_Clear
 	movlw	.5	    ;Need some time before it clear
 	call	LCD_delay_ms
-	lfsr    FSR0, myArray 
 	lfsr    FSR2, myinitial
-
+	
+	;loop for position
+pos_chk	lfsr    FSR0, myArray 
+	movlw	0x04
+	movwf	counter
 	
 testtest	
 	call	validate
 	decfsz  counter 
 	goto	testtest
+	movf	POSTINC2, W 	;initial sequence
+	decfsz  pos_counter 
+	goto	pos_chk
 	goto	$
-
-
+	
+;EVERYTHIN HERE ONWARDS IS SUBROUTINE
 validate
-	movf	POSTINC0, W 
+	movf	POSTINC0, W	;key in answer
 	movff	PLUSW1, storage
 	movf	storage, W
 	movwf	temp_ans	
-	;call	LCD_Send_Byte_D	
-	movf	POSTINC2, W 			;use the pressed button to obtain the data from bank6
+	;call	LCD_Send_Byte_D	 ;error checking
+	movf	INDF2, W 	;initial sequence
 	movff	PLUSW1, storage
 	movf	storage, W
-	;call	LCD_Send_Byte_D	
+	;call	LCD_Send_Byte_D	 ;error checking
 	CPFSEQ	temp_ans
 	call	wrong
 	CPFSEQ	temp_ans
 	return
 	call	correct	
 	return
-
+	
 correct	movlw	'Y'
 	call	LCD_Send_Byte_D	
 	call	LCD_delay_ms
@@ -148,6 +154,7 @@ wrong	movlw	'N'
 	call	LCD_delay_ms
 	return
 	
+;CORRECT CODE
 fair	call	read
 	movff	read_pos, dig_2
 	call	read
