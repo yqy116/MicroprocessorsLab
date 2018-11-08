@@ -1,5 +1,5 @@
     #include p18f87k22.inc
-extern	LCD_Setup, LCD_Write_Message, LCD_Write_Hex, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear
+extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear
    
 
 acs0    udata_acs   ; named variables in access ram
@@ -21,6 +21,7 @@ ans4	res 1
 myArray res 4 ;save answer
 counter res 1 ;count answer
 dumpster res 1
+temp_ans  res 1
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -89,6 +90,7 @@ loop	movlw	0xff
 	CPFSEQ	tempo
 	goto	answ
 	goto	loop
+	
 answ	movf	tempo, W
 	movff	tempo, POSTINC0
 	call	write
@@ -100,13 +102,38 @@ answ	movf	tempo, W
 	call	LCD_Clear
 	lfsr    FSR0, myArray 
 testtest	
-	call	write
+	call	validate
 	movf	POSTINC0, W 
 	decfsz  counter 
 	goto	testtest
 	goto	$
 
 
+validate
+	movff	PLUSW1, storage
+	movf	storage, W
+	movwf	temp_ans
+	movf	pos1, W				;use the pressed button to obtain the data from bank6
+	movff	PLUSW1, storage
+	movf	storage, W
+	CPFSEQ	temp_ans
+	call	wrong
+	CPFSEQ	temp_ans
+	return
+	call	correct	
+	return
+
+correct	movlw	'Y'
+	call	LCD_Send_Byte_D	
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	return
+wrong	movlw	'N'
+	call	LCD_Send_Byte_D	
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	return
+	
 	
 fair	call	read
 	movff	read_pos, dig_2
@@ -175,7 +202,6 @@ lookup
 	movlw	0x01
 	movff	storage, PLUSW1
 	
-	
 	movlw	'B'
 	movwf	storage
 	movlw	0x02
@@ -207,37 +233,31 @@ lookup
 	movwf	storage
 	movlw	0xE7
 	movff	storage, PLUSW1
+	
+;	
+;	movlw	0x00		    ; load all of the ascii codes into locations +/- away from the FSR1
+;	movwf	storage
+;	movlw	0x77
+;	movff	storage, PLUSW1
+;	
+;	movlw	0x01
+;	movwf	storage
+;	movlw	0xB7
+;	movff	storage, PLUSW1
+;	
+;	
+;	movlw	0x02
+;	movwf	storage
+;	movlw	0xD7
+;	movff	storage, PLUSW1
+;	
+;	movlw	0x03
+;	movwf	storage
+;	movlw	0xE7
+;	movff	storage, PLUSW1
+	
 	return
 
-table
-	movlb	6		    ;select bank 6
-	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
-	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
-	movwf	storage
-	movlw	0x77
-	movff	storage, PLUSW1
-	
-	movlw	'G'
-	movwf	storage
-	movlw	0xB7
-	movff	storage, PLUSW1
-	
-	
-	movlw	'B'
-	movwf	storage
-	movlw	0xD7
-	movff	storage, PLUSW1
-	
-	movlw	'Y'
-	movwf	storage
-	movlw	0xE7
-	movff	storage, PLUSW1
-	;for clear function
-;	movlw	'5'
-;	movwf	storage
-;	movlw	0xBB
-;	movff	storage, PLUSW1	
-	return	
 
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
