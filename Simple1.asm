@@ -25,8 +25,10 @@ pos_counter res 1   ;the position
 ans_pos	res 1	    ;key in position
 ran_pos	res 1	    ;rsequence position
 scoring	res 1
- 
- 
+temp_pst res 1
+temp_scr res 1
+temp_res res 1
+correct_count res 1
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
 	goto start
@@ -111,6 +113,8 @@ answ	movf	tempo, W
 	movlw	0x00
 	movwf	ran_pos
 	movwf	ans_pos
+	movwf	correct_count
+	movwf	temp_res
 	movlw	0x04
 	movwf	pos_counter
 	call	LCD_Clear
@@ -137,6 +141,7 @@ testtest
 	;movf	POSTINC0, W	;move it one
 	decfsz  pos_counter 
 	goto	pos_chk
+	movff	temp_res, PORTD
 	goto	$
 	
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE
@@ -167,8 +172,27 @@ correct	movf	ans_pos, W
 	
 cor_pos	movlw	'Y'
 	call	LCD_Send_Byte_D	
-;	movf	ran_pos, W
-;	bsf	PORTD, 
+	;movff	ran_pos, temp_pst
+	movlw	0x01
+	movwf	temp_scr
+	addwf	correct_count
+	movff	correct_count,temp_pst
+;	movf	temp_pst,W
+;	addlw	0x30
+;	call	LCD_Send_Byte_D
+	
+iter	decf	temp_pst
+	movlw	0x00
+	CPFSEQ	temp_pst
+	call    mutiplier	
+	movlw	0x00
+	CPFSEQ	temp_pst
+	bra	iter
+	movf	temp_scr, W
+	addwf	temp_res
+	movf	temp_scr,W
+	addlw	0x30
+	call	LCD_Send_Byte_D
 	return
 	
 wro_pos movlw	'Z'
@@ -177,8 +201,12 @@ wro_pos movlw	'Z'
 	
 wrong	movlw	'N'
 	;call	LCD_Send_Byte_D	
-	
 	return
+	
+mutiplier   movlw   0x02
+	    MULWF   temp_scr
+	    movff   PRODL, temp_scr
+	    return
 	
 ;CORRECT CODE
 fair	call	read
