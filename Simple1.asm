@@ -29,6 +29,12 @@ temp_pst res 1
 temp_scr res 1
 temp_res res 1
 correct_count res 1
+not_socorrect_count res 1
+not_socorrect_temp  res 1
+temp_res_2  res 1  
+game_counter res 1
+ 
+ 
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
 	goto start
@@ -56,9 +62,10 @@ start	clrf TRISD ; Set PORTD as all outputs
 	bsf INTCON,GIE ; Enable all interrupts
 	
 check	setf	TRISE
-	movlw	0xff
+	movlw	0x01
 	CPFSEQ	PORTE
 	bra	check
+	
 	;Start reading the values
 	call	fair
 	movff	dig_1, pos1
@@ -72,9 +79,13 @@ check	setf	TRISE
 	;stop interupt
 	movlw	b'00000000'
 	movwf	T0CON
-
+	
+	;intialise
+	movlw	0x03
+	movwf	game_counter
 	lfsr    FSR2, myinitial
 	call	lookup				;initialise the lookup table
+	
 	movlb	0				;select bank 0 so the access bank is used again
 	movf	pos1, W				;use the pressed button to obtain the data from bank6
 	movwf	POSTINC2
@@ -109,14 +120,16 @@ answ	movf	tempo, W
 	decfsz  counter
 	goto	loop
 	
-	;All kind of initialization
+initial	;All kind of initialization
 	movlw	0x00
 	movwf	ran_pos
 	movwf	ans_pos
 	movwf	correct_count
 	movwf	temp_res
+	movwf	not_socorrect_temp
 	movlw	0x04
-	movwf	pos_counter
+	movwf	pos_counter ;number of loop
+	movwf	not_socorrect_count
 	call	LCD_Clear
 	movlw	.5	    ;Need some time before it clear
 	call	LCD_delay_ms
@@ -131,6 +144,7 @@ pos_chk
 	movlw	0x04
 	movwf	counter
 	
+	
 testtest	
 	call	validate
 	movlw	0x01
@@ -139,12 +153,49 @@ testtest
 	goto	testtest
 	movf	POSTINC2, W 	;initial sequence
 	;movf	POSTINC0, W	;move it one
+	movlw	0x00
+	CPFSEQ	not_socorrect_temp
+	call	small_loop
 	decfsz  pos_counter 
 	goto	pos_chk
-	movff	temp_res, PORTD
+	clrf	TRISC
+	movff	temp_res, PORTC
+	goto	$
+	;goto	backgame
+	
+back_game
+	movlw	.5	    ;Need some time before it clear
+	call	LCD_delay_ms
+	call	LCD_Clear
+	movlw	.5	    ;Need some time before it clear
+	call	LCD_delay_ms
+	decfsz	game_counter
+	goto	keyin
 	goto	$
 	
+wro_pos movlw	'Z'
+	;call	LCD_Send_Byte_D	
+	movlw	0x01
+	CPFSEQ	not_socorrect_temp
+	call	logic
+	return
+
+logic	movlw	0x01
+	movwf	temp_scr
+	movwf	not_socorrect_temp
+	movff	not_socorrect_count, temp_pst
+	;addwf	temp_res
+	movf	not_socorrect_count, W
+	addlw	0x30 
+	call	LCD_Send_Byte_D
+	call	iter
+	return
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE
+small_loop  	
+	movlw	0x01
+	addwf	not_socorrect_count
+	return
+	
 validate
 	movf	POSTINC0, W	;key in answer
 	movff	PLUSW1, storage
@@ -177,9 +228,12 @@ cor_pos	movlw	'Y'
 	movwf	temp_scr
 	addwf	correct_count
 	movff	correct_count,temp_pst
-;	movf	temp_pst,W
-;	addlw	0x30
-;	call	LCD_Send_Byte_D
+	call	iter
+	movf	temp_scr, W
+	addwf	temp_res
+	return
+
+
 	
 iter	decf	temp_pst
 	movlw	0x00
@@ -188,16 +242,8 @@ iter	decf	temp_pst
 	movlw	0x00
 	CPFSEQ	temp_pst
 	bra	iter
-	movf	temp_scr, W
-	addwf	temp_res
-	movf	temp_scr,W
-	addlw	0x30
-	call	LCD_Send_Byte_D
-	return
+	return	
 	
-wro_pos movlw	'Z'
-	;call	LCD_Send_Byte_D	
-	return
 	
 wrong	movlw	'N'
 	;call	LCD_Send_Byte_D	
