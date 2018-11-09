@@ -4,6 +4,7 @@
    
 
 acs0    udata_acs   ; named variables in access ram
+int_ct	res 1
 pos1	res 1 ;first position for squence of colour
 pos2	res 1 ;second position for squence of colour
 pos3	res 1 ;so on
@@ -23,7 +24,7 @@ myinitial res 4;save initial values
 pos_counter res 1   ;the position 
 ans_pos	res 1	    ;key in position
 ran_pos	res 1	    ;rsequence position
-
+scoring	res 1
  
  
 rst	code 0x0000 ; reset vector	
@@ -33,7 +34,8 @@ int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
 	retfie FAST ; if not then return
 	;bra   scd_int
-	incf LATD ; increment PORTD
+;	incf LATD ; increment PORTD
+	incf int_ct
 	call	keyboard
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
@@ -117,7 +119,8 @@ answ	movf	tempo, W
 	lfsr    FSR2, myinitial
 	
 	;loop for position, initialise value that refresh
-pos_chk	lfsr    FSR0, myArray 
+pos_chk	
+	lfsr    FSR0, myArray 
 	movlw	0x01
 	movwf	ran_pos
 	addwf	ans_pos	;refreh position
@@ -131,6 +134,7 @@ testtest
 	decfsz  counter 
 	goto	testtest
 	movf	POSTINC2, W 	;initial sequence
+	;movf	POSTINC0, W	;move it one
 	decfsz  pos_counter 
 	goto	pos_chk
 	goto	$
@@ -153,10 +157,6 @@ validate
 	call	correct	
 	return
 
-;correct	movlw	'Y'
-;	call	LCD_Send_Byte_D	
-;	return
-	
 correct	movf	ans_pos, W
 	CPFSEQ	ran_pos
 	call	wro_pos
@@ -167,14 +167,16 @@ correct	movf	ans_pos, W
 	
 cor_pos	movlw	'Y'
 	call	LCD_Send_Byte_D	
+;	movf	ran_pos, W
+;	bsf	PORTD, 
 	return
 	
 wro_pos movlw	'Z'
-	call	LCD_Send_Byte_D	
+	;call	LCD_Send_Byte_D	
 	return
 	
 wrong	movlw	'N'
-	call	LCD_Send_Byte_D	
+	;call	LCD_Send_Byte_D	
 	
 	return
 	
@@ -220,7 +222,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	movwf	tempo
 	return
 	
-read	movff	PORTD, read_pos
+read	movff	int_ct, read_pos
 	call	LCD_delay_ms
 	return
 
