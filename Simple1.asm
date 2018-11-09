@@ -56,6 +56,7 @@ int_hi	code 0x0008 ; high vector, no low vector
 main	code
 start	clrf TRISD ; Set PORTD as all outputs
 	clrf LATD ; Clear PORTD outputs
+	clrf LATE
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
@@ -126,9 +127,10 @@ initial	;All kind of initialization
 	movwf	ans_pos
 	movwf	correct_count
 	movwf	temp_res
-	movwf	not_socorrect_temp
+	
 	movlw	0x04
 	movwf	pos_counter ;number of loop
+	movlw	0x05
 	movwf	not_socorrect_count
 	call	LCD_Clear
 	movlw	.5	    ;Need some time before it clear
@@ -143,7 +145,8 @@ pos_chk
 	addwf	ans_pos	;refreh position
 	movlw	0x04
 	movwf	counter
-	
+	movlw	0x00
+	movwf	not_socorrect_temp
 	
 testtest	
 	call	validate
@@ -163,15 +166,15 @@ testtest
 	goto	$
 	;goto	backgame
 	
-back_game
-	movlw	.5	    ;Need some time before it clear
-	call	LCD_delay_ms
-	call	LCD_Clear
-	movlw	.5	    ;Need some time before it clear
-	call	LCD_delay_ms
-	decfsz	game_counter
-	goto	keyin
-	goto	$
+;back_game
+;	movlw	.5	    ;Need some time before it clear
+;	call	LCD_delay_ms
+;	call	LCD_Clear
+;	movlw	.5	    ;Need some time before it clear
+;	call	LCD_delay_ms
+;	decfsz	game_counter
+;	goto	keyin
+;	goto	$
 	
 wro_pos movlw	'Z'
 	;call	LCD_Send_Byte_D	
@@ -189,11 +192,13 @@ logic	movlw	0x01
 	addlw	0x30 
 	call	LCD_Send_Byte_D
 	call	iter
+	movf	temp_scr, W
+	addwf	temp_res
 	return
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE
 small_loop  	
 	movlw	0x01
-	addwf	not_socorrect_count
+	addwf	not_socorrect_count,f
 	return
 	
 validate
