@@ -38,6 +38,12 @@ G_count	res 1
 Y_count res 1
 B_count res 1
 temp_store res 1
+B_count_seq res 1
+R_count_seq res 1
+Y_count_seq res 1
+G_count_seq res 1
+ 
+ 
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -85,9 +91,16 @@ check	setf	TRISE
 	movlw	b'00000000'
 	movwf	T0CON
 	
+
+	
 	;intialise
 	movlw	0x03
 	movwf	game_counter
+	movlw	0x00
+	movwf	R_count_seq
+	movwf	G_count_seq
+	movwf	Y_count_seq
+	movwf	B_count_seq
 	lfsr    FSR2, myinitial
 	call	lookup				;initialise the lookup table
 	
@@ -104,7 +117,51 @@ check	setf	TRISE
 	movf	pos4, W	
 	movwf	POSTINC2
 	call	write	
+;count
+	movff	pos1, temp_store
+	movf	temp_store, W
+	call	colour_count_seq
+	movff	pos2, temp_store
+	call	colour_count_seq
+	movff	pos3, temp_store
+	call	colour_count_seq
+	movff	pos4, temp_store
+	call	colour_count_seq
+	goto	keyin
 
+	
+colour_count_seq
+	movlw	0x00
+	CPFSEQ	temp_store
+	goto	second_count_seq
+	movlw	0x01
+	addwf	R_count_seq, f
+	return
+	
+second_count_seq	
+	movlw	0x01
+	CPFSEQ	temp_store
+	goto	third_count_seq
+	movlw	0x01
+	addwf	G_count_seq, f
+	return
+	
+third_count_seq	
+	movlw	0x02
+	CPFSEQ	temp_store
+	goto	fourth_count_seq
+	movlw	0x01
+	addwf	B_count_seq, f
+	return	
+
+fourth_count_seq	
+	movlw	0x03
+	CPFSEQ	temp_store
+	goto	back
+	movlw	0x01
+	addwf	Y_count_seq, f
+	return	
+	
 	
 keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
@@ -128,7 +185,7 @@ answ	movf	tempo, W
 	movff	tempo, temp_store
 	movff	tempo, POSTINC0
 	call	write
-	goto	colour_count
+	call	colour_count
 back	decfsz  counter
 	goto	loop
 	goto	initial
@@ -139,7 +196,7 @@ colour_count
 	goto	second_count
 	movlw	0x01
 	addwf	R_count, f
-	goto	back
+	return
 	
 second_count	
 	movlw	0xB7
@@ -147,7 +204,7 @@ second_count
 	goto	third_count
 	movlw	0x01
 	addwf	G_count, f
-	goto	back
+	return
 	
 third_count	
 	movlw	0xD7
@@ -155,15 +212,15 @@ third_count
 	goto	fourth_count
 	movlw	0x01
 	addwf	B_count, f
-	goto	back	
+	return	
 
 fourth_count	
 	movlw	0xE7
 	CPFSEQ	temp_store
-	goto	back
+	return
 	movlw	0x01
 	addwf	Y_count, f
-	goto	back		
+	return	
 	
 	
 initial	;All kind of initialization
@@ -206,22 +263,69 @@ testtest
 	call	small_loop
 	decfsz  pos_counter 
 	goto	pos_chk
+	call	comparison
+	movlw	0x04
+	CPFSGT	temp_store
+	goto	$
+	movff	temp_store,temp_pst
+	call	iter
+	movf	temp_scr, W
+	subwf	temp_res
 	clrf	TRISC
 	movff	temp_res, PORTC
-	movf	R_count,W
-	addlw	0x30
-	call	LCD_Send_Byte_D
-	movf	B_count,W
-	addlw	0x30
-	call	LCD_Send_Byte_D
-	movf	Y_count,W
-	addlw	0x30
-	call	LCD_Send_Byte_D
-	movf	G_count,W
-	addlw	0x30
-	call	LCD_Send_Byte_D
 	goto	$
 	;goto	backgame
+;	
+;iter	decf	temp_pst
+;	movlw	0x00
+;	CPFSEQ	temp_pst
+;	call    mutiplier	
+;	movlw	0x00
+;	CPFSEQ	temp_pst
+;	bra	iter
+;	return	
+;	
+;mutiplier   movlw   0x02
+;	    MULWF   temp_scr
+;	    movff   PRODL, temp_scr
+;	    return
+	    
+comparison
+	movlw	0x04	
+	movwf	temp_store
+	
+	movlw	0x00
+	movf	R_count_seq, W
+	;CPFSEQ	R_count
+	CPFSLT	R_count
+	subwf	R_count, W
+	CPFSLT	R_count
+	addwf	temp_store, f
+	
+	movlw	0x00
+	movf	G_count_seq, W
+	;CPFSEQ	G_count
+	CPFSLT	G_count
+	subwf	G_count, W
+	CPFSLT	G_count
+	addwf	temp_store, f
+	
+	movlw	0x00
+	movf	Y_count_seq, W
+	;CPFSEQ	Y_count
+	CPFSLT	Y_count
+	subwf	Y_count, W
+	CPFSLT	Y_count
+	addwf	temp_store, f
+	
+	movlw	0x00
+	movf	B_count_seq, W
+	;CPFSEQ	B_count
+	CPFSLT	B_count
+	subwf	B_count, W
+	CPFSLT	B_count
+	addwf	temp_store, f
+	return
 	
 ;back_game
 ;	movlw	.5	    ;Need some time before it clear
