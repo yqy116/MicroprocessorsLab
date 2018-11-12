@@ -57,7 +57,13 @@ int_hi	code 0x0008 ; high vector, no low vector
 ;	incf LATD ; increment PORTD
 	incf int_ct
 	call	keyboard
-	bcf INTCON,TMR0IF ; clear interrupt flag
+	;here onwards is to clear function
+	movlw	0xEE
+	CPFSEQ	tempo
+	goto	ending
+	goto	clear_flag
+	
+ending	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
 ;scd_int	btfss PIE1,TMR1IE; check that this is timer1 interrupt
@@ -161,6 +167,12 @@ fourth_count_seq
 	movlw	0x01
 	addwf	Y_count_seq, f
 	return		
+	
+clear_flag
+	bcf INTCON,TMR0IF ; clear interrupt flag
+	retfie FAST ; fast return from interrupt
+	goto	keyin
+	
 	
 keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
@@ -273,6 +285,10 @@ testtest
 	call	add_z
 	clrf	TRISC
 	movff	temp_res, PORTC
+	movlw	0x04
+	CPFSGT	y_count
+	movwf	PORTD
+	call	LCD_delay_ms
 	goto	back_game
 
 back_game
