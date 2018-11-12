@@ -42,8 +42,8 @@ B_count_seq res 1
 R_count_seq res 1
 Y_count_seq res 1
 G_count_seq res 1
- 
- 
+total_light res 1
+y_count	res 1
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -66,6 +66,7 @@ int_hi	code 0x0008 ; high vector, no low vector
 main	code
 start	clrf TRISD ; Set PORTD as all outputs
 	clrf LATD ; Clear PORTD outputs
+	clrf LATC
 	clrf LATE
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
@@ -229,9 +230,11 @@ initial	;All kind of initialization
 	movwf	ans_pos
 	movwf	correct_count
 	movwf	temp_res
+	movwf	y_count
 	
 	movlw	0x04
 	movwf	pos_counter ;number of loop
+	movwf	total_light
 	movlw	0x05
 	movwf	not_socorrect_count
 	call	LCD_Clear
@@ -263,35 +266,32 @@ testtest
 	call	small_loop
 	decfsz  pos_counter 
 	goto	pos_chk
-	call	comparison
-	movlw	0x04
-	CPFSGT	temp_store
-	goto	$
-	movff	temp_store,temp_pst
-	call	iter
-	movf	temp_scr, W
-	subwf	temp_res
-	clrf	TRISC
+;	call	comparison
+;	movf	temp_store,W
+;	addwf	correct_count,W
+;	subwf	total_light, f
+;	call	add_z
+;	clrf	TRISC
 	movff	temp_res, PORTC
 	goto	$
+	
+add_z	DECFSZ	total_light
+	goto	binary_z
+	return
+	
+binary_z 
+	movlw	0x05
+	addwf	total_light,f
+	movff	total_light,temp_pst
+	call	iter
+	movf	temp_scr, W
+	addwf	temp_res
+	goto	add_z
+
 	;goto	backgame
-;	
-;iter	decf	temp_pst
-;	movlw	0x00
-;	CPFSEQ	temp_pst
-;	call    mutiplier	
-;	movlw	0x00
-;	CPFSEQ	temp_pst
-;	bra	iter
-;	return	
-;	
-;mutiplier   movlw   0x02
-;	    MULWF   temp_scr
-;	    movff   PRODL, temp_scr
-;	    return
-	    
+
 comparison
-	movlw	0x04	
+	movlw	0x00	
 	movwf	temp_store
 	
 	movlw	0x00
@@ -340,8 +340,8 @@ comparison
 wro_pos movlw	'Z'
 	;call	LCD_Send_Byte_D	
 	movlw	0x01
-	CPFSEQ	not_socorrect_temp
-	call	logic
+;	CPFSEQ	not_socorrect_temp
+;	call	logic
 	return
 
 logic	movlw	0x01
@@ -398,7 +398,6 @@ cor_pos	movlw	'Y'
 	movf	temp_scr, W
 	addwf	temp_res
 	return
-
 
 	
 iter	decf	temp_pst
