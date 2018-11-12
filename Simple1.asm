@@ -33,7 +33,11 @@ not_socorrect_count res 1
 not_socorrect_temp  res 1
 temp_res_2  res 1  
 game_counter res 1
- 
+R_count	res 1
+G_count	res 1    
+Y_count res 1
+B_count res 1
+temp_store res 1
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -109,6 +113,11 @@ keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	lfsr FSR0, myArray 
 	movlw	0x04
 	movwf	counter
+	movlw	0x00
+	movwf	R_count
+	movwf	G_count
+	movwf	Y_count
+	movwf	B_count
 	
 loop	movlw	0xff
 	CPFSEQ	tempo
@@ -116,11 +125,27 @@ loop	movlw	0xff
 	goto	loop
 	
 answ	movf	tempo, W
+	movff	tempo, temp_store
 	movff	tempo, POSTINC0
 	call	write
-	decfsz  counter
+	movf	temp_store,W
+	call	LCD_Send_Byte_D
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	goto	colour_count
+back	decfsz  counter
 	goto	loop
+	goto	initial
 	
+colour_count
+	movlw	0x77
+	CPFSEQ	temp_store
+	goto	back
+	movlw	0x01
+	addwf	R_count, f
+	goto	back
+	
+
 initial	;All kind of initialization
 	movlw	0x00
 	movwf	ran_pos
@@ -163,6 +188,9 @@ testtest
 	goto	pos_chk
 	clrf	TRISC
 	movff	temp_res, PORTC
+	movf	R_count,W
+	addlw	0x30
+	call	LCD_Send_Byte_D
 	goto	$
 	;goto	backgame
 	
@@ -310,7 +338,6 @@ write
 	movf	storage, W
 	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
 	call	LCD_delay_ms
-	call	LCD_delay_ms
 	return
 	
 	
@@ -358,28 +385,6 @@ lookup
 	movwf	storage
 	movlw	0xE7
 	movff	storage, PLUSW1
-	
-;	
-;	movlw	0x00		    ; load all of the ascii codes into locations +/- away from the FSR1
-;	movwf	storage
-;	movlw	0x77
-;	movff	storage, PLUSW1
-;	
-;	movlw	0x01
-;	movwf	storage
-;	movlw	0xB7
-;	movff	storage, PLUSW1
-;	
-;	
-;	movlw	0x02
-;	movwf	storage
-;	movlw	0xD7
-;	movff	storage, PLUSW1
-;	
-;	movlw	0x03
-;	movwf	storage
-;	movlw	0xE7
-;	movff	storage, PLUSW1
 	
 	return
 
