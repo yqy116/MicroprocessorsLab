@@ -128,10 +128,6 @@ answ	movf	tempo, W
 	movff	tempo, temp_store
 	movff	tempo, POSTINC0
 	call	write
-	movf	temp_store,W
-	call	LCD_Send_Byte_D
-	call	LCD_delay_ms
-	call	LCD_delay_ms
 	goto	colour_count
 back	decfsz  counter
 	goto	loop
@@ -140,12 +136,36 @@ back	decfsz  counter
 colour_count
 	movlw	0x77
 	CPFSEQ	temp_store
-	goto	back
+	goto	second_count
 	movlw	0x01
 	addwf	R_count, f
 	goto	back
 	
+second_count	
+	movlw	0xB7
+	CPFSEQ	temp_store
+	goto	third_count
+	movlw	0x01
+	addwf	G_count, f
+	goto	back
+	
+third_count	
+	movlw	0xD7
+	CPFSEQ	temp_store
+	goto	fourth_count
+	movlw	0x01
+	addwf	B_count, f
+	goto	back	
 
+fourth_count	
+	movlw	0xE7
+	CPFSEQ	temp_store
+	goto	back
+	movlw	0x01
+	addwf	Y_count, f
+	goto	back		
+	
+	
 initial	;All kind of initialization
 	movlw	0x00
 	movwf	ran_pos
@@ -189,6 +209,15 @@ testtest
 	clrf	TRISC
 	movff	temp_res, PORTC
 	movf	R_count,W
+	addlw	0x30
+	call	LCD_Send_Byte_D
+	movf	B_count,W
+	addlw	0x30
+	call	LCD_Send_Byte_D
+	movf	Y_count,W
+	addlw	0x30
+	call	LCD_Send_Byte_D
+	movf	G_count,W
 	addlw	0x30
 	call	LCD_Send_Byte_D
 	goto	$
