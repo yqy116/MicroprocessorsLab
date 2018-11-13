@@ -1,6 +1,7 @@
 #include p18f87k22.inc
 
 	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear
+	extern	UART_Setup, UART_Transmit_Message
    
 
 acs0    udata_acs   ; named variables in access ram
@@ -49,6 +50,7 @@ exponent res 1
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
+	call UART_Setup
 	goto start
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
@@ -184,6 +186,7 @@ after_y	call	comparison
 	CPFSGT	y_count
 	movwf	PORTD
 	call	LCD_delay_ms
+	call	UART_Transmit_Message
 	goto	back_game
 
 back_game
