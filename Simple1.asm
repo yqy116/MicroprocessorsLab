@@ -65,6 +65,7 @@ start	call UART_Setup
 	clrf TRISD ; Set PORTD as all outputs
 	clrf LATD ; Clear PORTD outputs
 	clrf LATE
+	clrf LATC
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 	bsf PIE1, TMR1IE ; Enable timer2 interrupt
@@ -153,7 +154,6 @@ back	decfsz  counter
 	goto	loop
 	goto	initial
 	
-	
 initial	;All kind of initialization
 	movlw	0x00
 	movwf	temp_res
@@ -236,7 +236,7 @@ validate
 
 cor_pos	movlw	0x01
 	movwf	temp_scr
-	addwf	y_count, f
+	addwf	y_count
 	movff	y_count,temp_pst
 	call	iter
 	movf	temp_scr, W
