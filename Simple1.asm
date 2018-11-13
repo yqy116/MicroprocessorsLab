@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 
-	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear
+	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear, LCD_Write_Message
 	extern	UART_Setup, UART_Transmit_Message
    
 
@@ -46,7 +46,8 @@ G_count_seq res 1
 total_light res 1
 y_count	res 1 
 exponent res 1
- 
+end_mssg res 15
+word_count  res 1
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -191,10 +192,14 @@ after_y	call	comparison
 	clrf	TRISH
 	movff	temp_res, PORTH
 	movlw	0x04
-	CPFSGT	y_count
+	CPFSGT	y_count	    ;lose condition
 	call	buzzer
-	movlw	.4
-	lfsr	FSR2, myArray
+	movlw	0x04
+	CPFSEQ	y_count	    ;win condition
+	goto	restart
+	goto	win
+	
+restart	lfsr	FSR2, myArray
 	call	UART_Transmit_Message
 	goto	back_game
 
@@ -208,6 +213,54 @@ back_game
 	goto	keyin
 	goto	endgame
 
+win	goto	wingame
+	
+
+winTable data	    "You win!"	; message, plus carriage return	
+	
+myTable data	    "You lose!"	; message, plus carriage return
+
+endgame	
+	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
+	movlw	upper(myTable)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(myTable)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(myTable)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	.10
+	movwf	counter
+	movlw	0x10
+	movwf	counter
+	goto	loop_end
+
+wingame	
+	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
+	movlw	upper(winTable)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(winTable)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(winTable)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	.8
+	movwf	counter
+	movlw	0x08
+	movwf 	word_count	
+	goto	loop_end
+	
+loop_end
+	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	decfsz	counter		; count down to zero
+	bra	loop_end	; keep going until finished	
+	lfsr	FSR2, myArray
+print	movf	POSTINC2, W
+	call	LCD_Send_Byte_D
+	decfsz	word_count
+	goto	print
+	goto	$
+	
+;EVERYTHING HERE ONWARDS IS SUBROUTINE	
 buzzer	movlw	0x01
 	movwf	PORTD
 	movlw	0xf0
@@ -215,10 +268,7 @@ buzzer	movlw	0x01
 	call	LCD_delay_ms
 	clrf	PORTD
 	return
-
-endgame		
 	
-;EVERYTHING HERE ONWARDS IS SUBROUTINE	
 add_z	decfsz	total_light
 	goto	binary_z
 	return
