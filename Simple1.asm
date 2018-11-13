@@ -53,23 +53,20 @@ rst	code 0x0000 ; reset vector
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
 	retfie FAST ; if not then return
+	;btfss PIE1,TMR1IE
+	bra cont
 	;bra   scd_int
-;	incf LATD ; increment PORTD
-	incf int_ct
-	call	keyboard
-	;here onwards is to clear function
-	movlw	0xEE
-	CPFSEQ	tempo
-	goto	ending
-	goto	clear_flag
-	
-ending	bcf INTCON,TMR0IF ; clear interrupt flag
+	;call	keyboard
+cont	incf	int_ct
+	incf	LATD
+	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
-;scd_int	btfss PIE1,TMR1IE; check that this is timer1 interrupt
-;	retfie FAST ; if not then return
-;	call	keyboard
-;	retfie FAST
+scd_int	btfss PIE1,TMR1IE; check that this is timer1 interrupt
+	retfie FAST ; if not then return
+	
+	;call	keyboard
+	retfie FAST
 	
 main	code
 start	clrf TRISD ; Set PORTD as all outputs
@@ -77,13 +74,15 @@ start	clrf TRISD ; Set PORTD as all outputs
 	clrf LATE
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
+	movlw b'00110101' ; Set timer0 to 16-bit, Fosc/4/256
+	movwf T1CON 
+	bsf PIE1, TMR1IE ; Enable timer2 interrupt
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
 	
 check	movlw	0xEB
 	CPFSEQ	tempo
-	bra	check
-	
+	bra	check	
 	;Start reading the values
 	call	fair
 	movff	dig_1, pos1
@@ -122,7 +121,7 @@ check	movlw	0xEB
 	movf	pos4, W	
 	movwf	POSTINC2
 	call	write	
-	
+	goto	$
 ;count
 	movff	pos1, temp_store
 	movf	temp_store, W
@@ -134,44 +133,7 @@ check	movlw	0xEB
 	movff	pos4, temp_store
 	call	colour_count_seq
 	goto	keyin
-	
-colour_count_seq
-	movlw	0x00
-	CPFSEQ	temp_store
-	goto	second_count_seq
-	movlw	0x01
-	addwf	R_count_seq, f
-	return
-	
-second_count_seq	
-	movlw	0x01
-	CPFSEQ	temp_store
-	goto	third_count_seq
-	movlw	0x01
-	addwf	G_count_seq, f
-	return
-	
-third_count_seq	
-	movlw	0x02
-	CPFSEQ	temp_store
-	goto	fourth_count_seq
-	movlw	0x01
-	addwf	B_count_seq, f
-	return	
-
-fourth_count_seq	
-	movlw	0x03
-	CPFSEQ	temp_store
-	return
-	movlw	0x01
-	addwf	Y_count_seq, f
-	return		
-	
-clear_flag
-	bcf INTCON,TMR0IF ; clear interrupt flag
-	retfie FAST ; fast return from interrupt
-	goto	keyin
-	
+		
 	
 keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
@@ -191,46 +153,19 @@ loop	movlw	0xff
 	goto	answ
 	goto	loop
 	
-answ	movf	tempo, W
+answ	movlw	0xEE
+	CPFSEQ	tempo
+	goto	keyin
+	movf	tempo, W
 	movff	tempo, temp_store
 	movff	tempo, POSTINC0
 	call	write
 	call	colour_count
+	
 back	decfsz  counter
 	goto	loop
 	goto	initial
 	
-colour_count
-	movlw	0x77
-	CPFSEQ	temp_store
-	goto	second_count
-	movlw	0x01
-	addwf	R_count, f
-	return
-	
-second_count	
-	movlw	0xB7
-	CPFSEQ	temp_store
-	goto	third_count
-	movlw	0x01
-	addwf	G_count, f
-	return
-	
-third_count	
-	movlw	0xD7
-	CPFSEQ	temp_store
-	goto	fourth_count
-	movlw	0x01
-	addwf	B_count, f
-	return	
-
-fourth_count	
-	movlw	0xE7
-	CPFSEQ	temp_store
-	return
-	movlw	0x01
-	addwf	Y_count, f
-	return	
 	
 initial	;All kind of initialization
 	movlw	0x00
@@ -275,7 +210,9 @@ back_game
 	decfsz	game_counter
 	goto	keyin
 	goto	$
+
 	
+;EVERYTHING HERE ONWARDS IS SUBROUTINE	
 add_z	decfsz	total_light
 	goto	binary_z
 	return
@@ -292,8 +229,7 @@ binary_z
 	addwf	temp_res, f
 	goto	add_z	
 	
-;EVERYTHING HERE ONWARDS IS SUBROUTINE
-	
+
 validate
 	movf	POSTINC0, W	;key in answer
 	movff	PLUSW1, storage
@@ -398,8 +334,6 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	call	delay
 	movf	PORTJ, W, ACCESS		;combine the row and column binary stuff and output it to portD
 	iorwf	adder, W
-	clrf	TRISH
-	movwf	PORTH	
 	movwf	tempo
 	return
 	
@@ -463,7 +397,70 @@ lookup
 	
 	return
 
+colour_count_seq
+	movlw	0x00
+	CPFSEQ	temp_store
+	goto	second_count_seq
+	movlw	0x01
+	addwf	R_count_seq, f
+	return
+	
+second_count_seq	
+	movlw	0x01
+	CPFSEQ	temp_store
+	goto	third_count_seq
+	movlw	0x01
+	addwf	G_count_seq, f
+	return
+	
+third_count_seq	
+	movlw	0x02
+	CPFSEQ	temp_store
+	goto	fourth_count_seq
+	movlw	0x01
+	addwf	B_count_seq, f
+	return	
 
+fourth_count_seq	
+	movlw	0x03
+	CPFSEQ	temp_store
+	return
+	movlw	0x01
+	addwf	Y_count_seq, f
+	return	
+
+colour_count
+	movlw	0x77
+	CPFSEQ	temp_store
+	goto	second_count
+	movlw	0x01
+	addwf	R_count, f
+	return
+	
+second_count	
+	movlw	0xB7
+	CPFSEQ	temp_store
+	goto	third_count
+	movlw	0x01
+	addwf	G_count, f
+	return
+	
+third_count	
+	movlw	0xD7
+	CPFSEQ	temp_store
+	goto	fourth_count
+	movlw	0x01
+	addwf	B_count, f
+	return	
+
+fourth_count	
+	movlw	0xE7
+	CPFSEQ	temp_store
+	return
+	movlw	0x01
+	addwf	Y_count, f
+	return		
+	
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
 	return
