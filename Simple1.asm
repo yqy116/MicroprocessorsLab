@@ -53,20 +53,13 @@ rst	code 0x0000 ; reset vector
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
 	retfie FAST ; if not then return
-	;btfss PIE1,TMR1IE
-	bra cont
-	;bra   scd_int
-	;call	keyboard
-cont	incf	int_ct
-	incf	LATD
+	;incf	LATD
+	incf	int_ct
+	call	keyboard
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
-scd_int	btfss PIE1,TMR1IE; check that this is timer1 interrupt
-	retfie FAST ; if not then return
-	
-	;call	keyboard
-	retfie FAST
+
 	
 main	code
 start	clrf TRISD ; Set PORTD as all outputs
@@ -74,8 +67,6 @@ start	clrf TRISD ; Set PORTD as all outputs
 	clrf LATE
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
-	movlw b'00110101' ; Set timer0 to 16-bit, Fosc/4/256
-	movwf T1CON 
 	bsf PIE1, TMR1IE ; Enable timer2 interrupt
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
@@ -121,7 +112,6 @@ check	movlw	0xEB
 	movf	pos4, W	
 	movwf	POSTINC2
 	call	write	
-	goto	$
 ;count
 	movff	pos1, temp_store
 	movf	temp_store, W
@@ -153,10 +143,7 @@ loop	movlw	0xff
 	goto	answ
 	goto	loop
 	
-answ	movlw	0xEE
-	CPFSEQ	tempo
-	goto	keyin
-	movf	tempo, W
+answ	movf	tempo, W
 	movff	tempo, temp_store
 	movff	tempo, POSTINC0
 	call	write
