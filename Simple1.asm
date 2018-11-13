@@ -354,7 +354,6 @@ correct	movf	ans_pos, W
 	
 cor_pos	movlw	'Y'
 	call	LCD_Send_Byte_D	
-	;movff	ran_pos, temp_pst
 	movlw	0x01
 	addwf	y_count
 	movwf	temp_scr
@@ -523,28 +522,6 @@ lookup
 	movwf	storage
 	movlw	0xE7
 	movff	storage, PLUSW1
-	
-;	
-;	movlw	0x00		    ; load all of the ascii codes into locations +/- away from the FSR1
-;	movwf	storage
-;	movlw	0x77
-;	movff	storage, PLUSW1
-;	
-;	movlw	0x01
-;	movwf	storage
-;	movlw	0xB7
-;	movff	storage, PLUSW1
-;	
-;	
-;	movlw	0x02
-;	movwf	storage
-;	movlw	0xD7
-;	movff	storage, PLUSW1
-;	
-;	movlw	0x03
-;	movwf	storage
-;	movlw	0xE7
-;	movff	storage, PLUSW1
 	
 	return
 
