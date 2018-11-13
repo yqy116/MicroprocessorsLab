@@ -50,7 +50,6 @@ exponent res 1
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
-	call UART_Setup
 	goto start
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
@@ -62,7 +61,8 @@ int_hi	code 0x0008 ; high vector, no low vector
 	retfie FAST ; fast return from interrupt
 	
 main	code
-start	clrf TRISD ; Set PORTD as all outputs
+start	call UART_Setup
+	clrf TRISD ; Set PORTD as all outputs
 	clrf LATD ; Clear PORTD outputs
 	clrf LATE
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
@@ -186,7 +186,9 @@ after_y	call	comparison
 	CPFSGT	y_count
 	movwf	PORTD
 	call	LCD_delay_ms
-	call	UART_Transmit_Message
+;	movlw	0x04
+;	lfsr	FSR2, myArray
+;	call	UART_Transmit_Message
 	goto	back_game
 
 back_game
