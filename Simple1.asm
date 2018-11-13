@@ -122,7 +122,7 @@ check	movlw	0xEB
 	movf	pos4, W	
 	movwf	POSTINC2
 	call	write	
-
+	
 ;count
 	movff	pos1, temp_store
 	movf	temp_store, W
