@@ -72,7 +72,8 @@ start	call UART_Setup
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
 	
-check	movlw	0xEB
+check	
+	movlw	0xEB
 	CPFSEQ	tempo
 	bra	check	
 	;Start reading the values
@@ -184,8 +185,7 @@ after_y	call	comparison
 	movff	temp_res, PORTH
 	movlw	0x04
 	CPFSGT	y_count
-	movwf	PORTD
-	call	LCD_delay_ms
+	call	buzzer
 	movlw	.4
 	lfsr	FSR2, myArray
 	call	UART_Transmit_Message
@@ -201,6 +201,14 @@ back_game
 	goto	keyin
 	goto	$
 
+buzzer	movlw	0x01
+	movwf	PORTD
+	movlw	0xf0
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	clrf	PORTD
+	return
+	
 	
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE	
 add_z	decfsz	total_light
