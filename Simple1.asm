@@ -180,15 +180,15 @@ after_y	call	comparison
 	movlw	0x01
 	addwf	total_light,f
 	call	add_z
-	clrf	TRISC
-	movff	temp_res, PORTC
+	clrf	TRISH
+	movff	temp_res, PORTH
 	movlw	0x04
 	CPFSGT	y_count
 	movwf	PORTD
 	call	LCD_delay_ms
-;	movlw	0x04
-;	lfsr	FSR2, myArray
-;	call	UART_Transmit_Message
+	movlw	.4
+	lfsr	FSR2, myArray
+	call	UART_Transmit_Message
 	goto	back_game
 
 back_game
