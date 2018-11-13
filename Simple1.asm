@@ -261,6 +261,7 @@ retry	movlw	0x7E	;loop the game again
 	CPFSEQ	tempo
 	goto	retry
 	call	LCD_Clear
+	clrf	PORTH 
 	goto	start
 	
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE	
