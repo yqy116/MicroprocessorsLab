@@ -213,7 +213,6 @@ back_game
 	goto	keyin
 	goto	endgame
 
-	
 
 winTable data	    "You win!"	; message, plus carriage return	
 	
@@ -229,7 +228,7 @@ endgame
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	.10
 	movwf	counter
-	movlw	0x10
+	movlw	0x09
 	movwf	word_count
 	goto	loop_end
 
@@ -257,7 +256,12 @@ print	movf	POSTINC2, W
 	call	LCD_Send_Byte_D
 	decfsz	word_count
 	goto	print
-	goto	$
+	
+retry	movlw	0x7E	;loop the game again
+	CPFSEQ	tempo
+	goto	retry
+	call	LCD_Clear
+	goto	start
 	
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE	
 buzzer	movlw	0x01
