@@ -127,7 +127,9 @@ check
 	goto	keyin
 		
 	
-keyin	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
+keyin	call	LCD_Clear
+	movlw	.5
+	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
@@ -145,7 +147,12 @@ loop	movlw	0xff
 	goto	answ
 	goto	loop
 	
-answ	movf	tempo, W
+answ	movlw	0xEE
+	CPFSEQ	tempo
+	goto	accept
+	goto	keyin
+
+accept	movf	tempo, W
 	movff	tempo, temp_store
 	movff	tempo, POSTINC0
 	call	write
@@ -199,7 +206,7 @@ back_game
 	call	LCD_delay_ms
 	decfsz	game_counter
 	goto	keyin
-	goto	$
+	goto	endgame
 
 buzzer	movlw	0x01
 	movwf	PORTD
@@ -208,7 +215,8 @@ buzzer	movlw	0x01
 	call	LCD_delay_ms
 	clrf	PORTD
 	return
-	
+
+endgame		
 	
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE	
 add_z	decfsz	total_light
