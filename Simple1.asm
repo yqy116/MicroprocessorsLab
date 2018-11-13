@@ -58,8 +58,6 @@ int_hi	code 0x0008 ; high vector, no low vector
 	call	keyboard
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
-
-
 	
 main	code
 start	clrf TRISD ; Set PORTD as all outputs
@@ -215,7 +213,6 @@ binary_z
 	movf	temp_scr, W
 	addwf	temp_res, f
 	goto	add_z	
-	
 
 validate
 	movf	POSTINC0, W	;key in answer
@@ -296,7 +293,6 @@ fair	call	read
 	MULWF	dig_2, W
 	movf	PRODL, W
 	ADDWF	dig_1, f
-	
 	return
 
 keyboard	;banksel cannot be same line with a label,etc.start
