@@ -75,14 +75,18 @@ main	code
 start	clrf TRISD ; Set PORTD as all outputs
 	clrf LATD ; Clear PORTD outputs
 	clrf LATE
+	movlw	0x00
+	movwf	dig_2
+	movwf	dig_1
+	movwf	pos1
+	movwf	int_ct
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
 	
-check	setf	TRISE
-	movlw	0x01
-	CPFSEQ	PORTE
+check	movlw	0xEB
+	CPFSEQ	tempo
 	bra	check
 	
 	;Start reading the values
