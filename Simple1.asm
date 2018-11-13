@@ -234,47 +234,23 @@ fourth_count
 	
 initial	;All kind of initialization
 	movlw	0x00
-	movwf	ran_pos
-	movwf	ans_pos
-	movwf	correct_count
 	movwf	temp_res
 	movwf	y_count
-	
+	lfsr    FSR0, myArray 
+	lfsr    FSR2, myinitial
 	movlw	0x04
 	movwf	pos_counter ;number of loop
 	movwf	total_light
-	movlw	0x05
-	movwf	not_socorrect_count
 	call	LCD_Clear
 	movlw	.5	    ;Need some time before it clear
 	call	LCD_delay_ms
-	lfsr    FSR2, myinitial
-	
-	;loop for position, initialise value that refresh
-pos_chk	
-	lfsr    FSR0, myArray 
-	movlw	0x01
-	movwf	ran_pos
-	addwf	ans_pos	;refreh position
-	movlw	0x04
-	movwf	counter
-	movlw	0x00
-	movwf	not_socorrect_temp
-	
+
 testtest	
 	call	validate
-	movlw	0x01
-	addwf	ran_pos
-	decfsz  counter 
-	goto	testtest
-	movf	POSTINC2, W 	;initial sequence
-	;movf	POSTINC0, W	;move it one
-	movlw	0x00
-	CPFSEQ	not_socorrect_temp
-	call	small_loop
 	decfsz  pos_counter 
-	goto	pos_chk
-	call	comparison
+	goto	testtest
+	
+after_y	call	comparison
 	movf	temp_store,W
 	addwf	y_count,W
 	subwf	total_light, f
@@ -317,10 +293,6 @@ binary_z
 	goto	add_z	
 	
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE
-small_loop  	
-	movlw	0x01
-	addwf	not_socorrect_count,f
-	return
 	
 validate
 	movf	POSTINC0, W	;key in answer
@@ -328,28 +300,19 @@ validate
 	movf	storage, W
 	movwf	temp_ans	
 	;call	LCD_Send_Byte_D	 ;error checking
-	movf	INDF2, W 	;initial sequence
+	movf	POSTINC2, W 	;initial sequence
 	movff	PLUSW1, storage
 	movf	storage, W
 	;call	LCD_Send_Byte_D	 ;error checking
 	CPFSEQ	temp_ans
 	return
-	call	correct	
+	call	cor_pos	
 	return
 
-correct	movf	ans_pos, W
-	CPFSEQ	ran_pos
-	return
-	call	cor_pos
-	return
-	
-cor_pos	movlw	'Y'
-	call	LCD_Send_Byte_D	
-	movlw	0x01
-	addwf	y_count
+cor_pos	movlw	0x01
 	movwf	temp_scr
-	addwf	correct_count
-	movff	correct_count,temp_pst
+	addwf	y_count, f
+	movff	y_count,temp_pst
 	call	iter
 	movf	temp_scr, W
 	addwf	temp_res
@@ -372,34 +335,26 @@ mutiplier   movlw   0x02
 comparison
 	movlw	0x00	
 	movwf	temp_store
-	
-	movlw	0x00
+
 	movf	R_count_seq, W
-	;CPFSEQ	R_count
 	CPFSLT	R_count
 	subwf	R_count, W
 	CPFSLT	R_count
 	addwf	temp_store, f
 	
-	movlw	0x00
 	movf	G_count_seq, W
-	;CPFSEQ	G_count
 	CPFSLT	G_count
 	subwf	G_count, W
 	CPFSLT	G_count
 	addwf	temp_store, f
 	
-	movlw	0x00
 	movf	Y_count_seq, W
-	;CPFSEQ	Y_count
 	CPFSLT	Y_count
 	subwf	Y_count, W
 	CPFSLT	Y_count
 	addwf	temp_store, f
 	
-	movlw	0x00
 	movf	B_count_seq, W
-	;CPFSEQ	B_count
 	CPFSLT	B_count
 	subwf	B_count, W
 	CPFSLT	B_count
