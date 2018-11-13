@@ -197,7 +197,7 @@ after_y	call	comparison
 	movlw	0x04
 	CPFSEQ	y_count	    ;win condition
 	goto	restart
-	goto	win
+	goto	wingame
 	
 restart	lfsr	FSR2, myArray
 	call	UART_Transmit_Message
@@ -213,7 +213,6 @@ back_game
 	goto	keyin
 	goto	endgame
 
-win	goto	wingame
 	
 
 winTable data	    "You win!"	; message, plus carriage return	
@@ -231,7 +230,7 @@ endgame
 	movlw	.10
 	movwf	counter
 	movlw	0x10
-	movwf	counter
+	movwf	word_count
 	goto	loop_end
 
 wingame	
@@ -253,7 +252,7 @@ loop_end
 	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
 	decfsz	counter		; count down to zero
 	bra	loop_end	; keep going until finished	
-	lfsr	FSR2, myArray
+	lfsr	FSR2, end_mssg
 print	movf	POSTINC2, W
 	call	LCD_Send_Byte_D
 	decfsz	word_count
