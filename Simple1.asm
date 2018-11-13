@@ -75,11 +75,6 @@ main	code
 start	clrf TRISD ; Set PORTD as all outputs
 	clrf LATD ; Clear PORTD outputs
 	clrf LATE
-	movlw	0x00
-	movwf	dig_2
-	movwf	dig_1
-	movwf	pos1
-	movwf	int_ct
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
@@ -338,15 +333,11 @@ validate
 	movf	storage, W
 	;call	LCD_Send_Byte_D	 ;error checking
 	CPFSEQ	temp_ans
-	call	wrong
-	CPFSEQ	temp_ans
 	return
 	call	correct	
 	return
 
 correct	movf	ans_pos, W
-	CPFSEQ	ran_pos
-	call	wro_pos
 	CPFSEQ	ran_pos
 	return
 	call	cor_pos
@@ -364,9 +355,6 @@ cor_pos	movlw	'Y'
 	addwf	temp_res
 	return
 	
-wro_pos movlw	'Z'
-	return
-	
 iter	decf	temp_pst
 	movlw	0x00
 	CPFSEQ	temp_pst
@@ -375,11 +363,6 @@ iter	decf	temp_pst
 	CPFSEQ	temp_pst
 	bra	iter
 	return	
-	
-	
-wrong	movlw	'N'
-	;call	LCD_Send_Byte_D	
-	return
 	
 mutiplier   movlw   0x02
 	    MULWF   temp_scr
