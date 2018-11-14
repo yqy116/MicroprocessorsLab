@@ -13,7 +13,7 @@
 	global	int_ct
 	
 acs0    udata_acs   ; named variables in access ram
-int_ct	    res 1
+int_ct	res 1
 pos1	res 1 ;first position for squence of colour
 pos2	res 1 ;second position for squence of colour
 pos3	res 1 ;so on
