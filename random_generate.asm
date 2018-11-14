@@ -1,7 +1,7 @@
 #include p18f87k22.inc
 	global	fair,read
 	global	dig_1
-	extern	int_ct
+	extern	int_ct, LCD_delay_ms
 
 
 acs0	    udata_acs
