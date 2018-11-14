@@ -72,11 +72,16 @@ start	call UART_Setup
 	bsf PIE1, TMR1IE ; Enable timer2 interrupt
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
-	
+	call	startgame
+	call	loop_end
+	call	print
 check	
 	movlw	0xEB
 	CPFSEQ	tempo
 	bra	check	
+	call	LCD_Clear
+	movlw	.5
+	call	LCD_delay_ms
 	;Start reading the values
 	call	fair
 	movff	dig_1, pos1
@@ -197,8 +202,11 @@ after_y	call	comparison
 	movlw	0x04
 	CPFSEQ	y_count	    ;win condition
 	goto	restart
-	goto	wingame
-	
+	call	wingame
+	call	loop_end
+	call	print
+	goto	retry
+
 restart	lfsr	FSR2, myArray
 	call	UART_Transmit_Message
 	goto	back_game
@@ -211,13 +219,42 @@ back_game
 	call	LCD_delay_ms
 	decfsz	game_counter
 	goto	keyin
-	goto	endgame
+	call	endgame
+	call	loop_end
+	call	print
+	goto	retry
 
-
+retry	movlw	0x7E	;loop the game again
+	CPFSEQ	tempo
+	goto	retry
+	call	LCD_Clear
+	movlw	.5
+	call	LCD_delay_ms
+	clrf	PORTH 
+	goto	start	
+	
+	
+;EVERYTHING HERE ONWARDS IS SUBROUTINE	
+	
+startTable data	    "Start Game:E"	; message, plus carriage return
 winTable data	    "You win!"	; message, plus carriage return	
 	
 myTable data	    "You lose!"	; message, plus carriage return
 
+startgame	
+	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
+	movlw	upper(startTable)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(startTable)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(startTable)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	.12
+	movwf	counter
+	movlw	0x0C
+	movwf	word_count
+	return
+ 
 endgame	
 	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
 	movlw	upper(myTable)	; address of data in PM
@@ -230,7 +267,7 @@ endgame
 	movwf	counter
 	movlw	0x09
 	movwf	word_count
-	goto	loop_end
+	return
 
 wingame	
 	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
@@ -244,7 +281,7 @@ wingame
 	movwf	counter
 	movlw	0x08
 	movwf 	word_count	
-	goto	loop_end
+	return
 	
 loop_end
 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
@@ -252,19 +289,13 @@ loop_end
 	decfsz	counter		; count down to zero
 	bra	loop_end	; keep going until finished	
 	lfsr	FSR2, end_mssg
+	return
 print	movf	POSTINC2, W
 	call	LCD_Send_Byte_D
 	decfsz	word_count
 	goto	print
-	
-retry	movlw	0x7E	;loop the game again
-	CPFSEQ	tempo
-	goto	retry
-	call	LCD_Clear
-	clrf	PORTH 
-	goto	start
-	
-;EVERYTHING HERE ONWARDS IS SUBROUTINE	
+	return
+
 buzzer	movlw	0x01
 	movwf	PORTD
 	movlw	0xf0
