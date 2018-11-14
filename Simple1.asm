@@ -11,7 +11,7 @@
 	extern	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
 	extern	validate,add_z,binary_z,iter,mutiplier
 	extern	UART_Setup, UART_Transmit_Message
-	global	int_ct,pos1,pos2,pos3,pos4
+	global	int_ct,pos1,pos2,pos3,pos4,myArray, myinitial
 	
 acs0    udata_acs   ; named variables in access ram
 int_ct	res 1
@@ -107,6 +107,8 @@ check	movlw	0xff
 	call	count
 
 ;key in guess
+;answering
+;	call	keyin
 keyin	call	LCD_Clear
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
