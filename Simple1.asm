@@ -1,12 +1,12 @@
 #include p18f87k22.inc
 	extern	fair,read
 	extern	dig_1
-	extern	startgame, endgame, wingame ,print, counter, loop_end, buzzer
+	extern	startgame, endgame, wingame ,print, counter, loop_end, buzzer, print_answer
 	extern	temp_store,colour_count_seq,colour_count, comparison
 	extern	tempo, keyboard
 	extern	R_count,G_count,Y_count,B_count,R_count_seq,G_count_seq,Y_count_seq,B_count_seq
 	extern	storage,lookup, write
-	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear, LCD_Write_Message
+	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear, LCD_Write_Message, secondline
 	extern	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
 	extern	validate,add_z,binary_z,iter,mutiplier
 	extern	UART_Setup, UART_Transmit_Message
@@ -196,6 +196,14 @@ back_game
 	call	endgame
 	call	loop_end
 	call	print
+	movlw	0x04
+	movwf	temp_store
+	lfsr	FSR2,myinitial
+	call	secondline
+
+show	call	print_answer
+	decfsz	temp_store
+	goto	show
 	goto	retry
 
 retry	movlw	0x7E	;loop the game again
@@ -208,3 +216,4 @@ retry	movlw	0x7E	;loop the game again
 	goto	start	
 	
 	end
+
