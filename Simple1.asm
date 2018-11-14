@@ -1,5 +1,6 @@
 #include p18f87k22.inc
 	extern	fair,read
+	extern	count
 	extern	dig_1
 	extern	startgame, endgame, wingame ,print, counter, loop_end, buzzer, print_answer
 	extern	temp_store,colour_count_seq,colour_count, comparison
@@ -10,7 +11,7 @@
 	extern	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
 	extern	validate,add_z,binary_z,iter,mutiplier
 	extern	UART_Setup, UART_Transmit_Message
-	global	int_ct
+	global	int_ct,pos1,pos2,pos3,pos4
 	
 acs0    udata_acs   ; named variables in access ram
 int_ct	res 1
@@ -32,8 +33,9 @@ int_hi	code 0x0008 ; high vector, no low vector
 	goto	second
 	incf	LATD
 	incf	int_ct
+	movlw	.1
 	;retfie FAST ; if not then return
-	;call	keyboard
+	call	keyboard
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
@@ -78,23 +80,18 @@ check	movlw	0xff
 	call	fair
 	movff	dig_1, pos4
 
-	;stop interupt
-	movlw	b'00000000'
-	movwf	T0CON
+;	;stop interupt
+;	movlw	b'00000000'
+;	movwf	T0CON
 	
 	;intialise
 	movlw	0x05
 	movwf	game_counter
-	movlw	0x00
-	movwf	R_count_seq
-	movwf	G_count_seq
-	movwf	Y_count_seq
-	movwf	B_count_seq
-	lfsr    FSR2, myinitial
 	call	lookup				;initialise the lookup table
-	
+	movlb	0
+	lfsr    FSR2, myinitial
+
 	;will remove the write at end of game
-	movlb	0				;select bank 0 so the access bank is used again
 	movf	pos1, W				;use the pressed button to obtain the data from bank6
 	movwf	POSTINC2
 	call	write
@@ -107,17 +104,7 @@ check	movlw	0xff
 	movf	pos4, W	
 	movwf	POSTINC2
 	call	write	
-;count
-	movff	pos1, temp_store
-	movf	temp_store, W
-	call	colour_count_seq
-	movff	pos2, temp_store
-	call	colour_count_seq
-	movff	pos3, temp_store
-	call	colour_count_seq
-	movff	pos4, temp_store
-	call	colour_count_seq
-	goto	keyin
+	call	count
 
 ;key in guess
 keyin	call	LCD_Clear
@@ -128,11 +115,6 @@ keyin	call	LCD_Clear
 	lfsr FSR0, myArray 
 	movlw	0x04
 	movwf	counter
-	movlw	0x00
-	movwf	R_count
-	movwf	G_count
-	movwf	Y_count
-	movwf	B_count
 	
 loop	movlw	0xff
 	CPFSEQ	tempo
@@ -226,6 +208,8 @@ retry	movlw	0x7E	;loop the game again
 	call	LCD_delay_ms
 	clrf	PORTH 
 	goto	start	
-	
+
 	end
 
+
+	
