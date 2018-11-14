@@ -1,5 +1,4 @@
 #include p18f87k22.inc
-	extern	delay
 	global	tempo, keyboard
 	
 acs0	    udata_acs
@@ -33,5 +32,8 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	iorwf	adder, W
 	movwf	tempo
 	return
-	
+
+delay	decfsz 0x01 ; decrement until zero
+	bra delay
+	return
 end
