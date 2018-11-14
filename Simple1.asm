@@ -1,4 +1,6 @@
 #include p18f87k22.inc
+	extern	fair,read
+	extern	dig_1
 	extern	startgame, endgame, wingame ,print, counter, loop_end, buzzer
 	extern	temp_store,colour_count_seq,colour_count, comparison
 	extern	tempo, keyboard
@@ -8,25 +10,18 @@
 	extern	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
 	extern	validate,add_z,binary_z,iter,mutiplier
 	extern	UART_Setup, UART_Transmit_Message
-	global	delay
+	global	int_ct
 	
 acs0    udata_acs   ; named variables in access ram
-int_ct	res 1
+int_ct	    res 1
 pos1	res 1 ;first position for squence of colour
 pos2	res 1 ;second position for squence of colour
 pos3	res 1 ;so on
 pos4	res 1
-dig_1	res 1
-dig_2	res 1
-read_pos res 1
-number	res 1
 myArray res 4 ;save answer
-;counter res 1 ;count answer
-dumpster res 1
 myinitial res 4;save initial values
-pos_counter res 1   ;the position 
-scoring	res 1
-game_counter res 1
+pos_counter res 1   ;the logic position 
+game_counter res 1  ;the loop of game
 
  
 rst	code 0x0000 ; reset vector	
@@ -213,28 +208,4 @@ retry	movlw	0x7E	;loop the game again
 	clrf	PORTH 
 	goto	start	
 	
-	
-;EVERYTHING HERE ONWARDS IS SUBROUTINE	
-	
-;CORRECT CODE
-fair	call	read
-	movff	read_pos, dig_2
-	call	read
-	movff	read_pos, dig_1
-	movlw	0x01 ;masking
-	ANDWF	dig_2, f
-	ANDWF	dig_1, f
-	movlw	0x02
-	MULWF	dig_2, W
-	movf	PRODL, W
-	ADDWF	dig_1, f
-	return
-	
-read	movff	int_ct, read_pos
-	call	LCD_delay_ms
-	return
-
-delay	decfsz 0x01 ; decrement until zero
-	bra delay
-	return
 	end
