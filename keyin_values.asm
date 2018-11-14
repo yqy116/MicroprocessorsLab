@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 	extern	colour_count, write, LCD_Clear
-	extern	myArray, counter,tempo, temp_store
+	extern	myArray, counter,tempo, temp_store, R_count, G_count, Y_count, B_count
 	global	keyin
 	
 	
@@ -13,6 +13,11 @@ keyin	call	LCD_Clear
 	lfsr FSR0, myArray 
 	movlw	0x04
 	movwf	counter
+	movlw	0x00
+	movwf	R_count
+	movwf	G_count
+	movwf	Y_count
+	movwf	B_count
 	
 loop	movlw	0xff
 	CPFSEQ	tempo
