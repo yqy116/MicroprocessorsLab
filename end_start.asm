@@ -1,6 +1,6 @@
 #include p18f87k22.inc
-	extern LCD_Send_Byte_D, LCD_delay_ms
-	global startgame, endgame, wingame ,print, counter, loop_end, buzzer
+	extern LCD_Send_Byte_D, LCD_delay_ms, write
+	global startgame, endgame, wingame ,print, counter, loop_end, buzzer, print_answer
 	    
 acs0	    udata_acs
 counter	    res 1 
@@ -77,5 +77,9 @@ buzzer	movlw	0x01
 	call	LCD_delay_ms
 	clrf	PORTD
 	return	
-	
+
+print_answer
+	movf	POSTINC2, W
+	call	write
+	return
 end
