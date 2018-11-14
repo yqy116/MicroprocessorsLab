@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 
-    global  LCD_Setup, LCD_Write_Message, LCD_Write_Hex, LCD_Send_Byte_D ,calculation, LCD_delay_ms,LCD_Clear
+    global  LCD_Setup, LCD_Write_Message, LCD_Send_Byte_D , LCD_delay_ms,LCD_Clear
     
 
 acs0    udata_acs   ; named variables in access ram
@@ -9,26 +9,6 @@ LCD_cnt_h   res 1   ; reserve 1 byte for variable LCD_cnt_h
 LCD_cnt_ms  res 1   ; reserve 1 byte for ms counter
 LCD_tmp	    res 1   ; reserve 1 byte for temporary use
 LCD_counter res 1   ; reserve 1 byte for counting through nessage
-high_16	    res 1
-low_16	    res	1
-eight	    res	1    
-temp_1	    res	1
-temp_2	    res	1
-temp_3	    res	1
-temp_4	    res	1
-temp_5	    res 1
-carry	    res 1
-bigthing    res 1
-multiplier  res 1
-lowbit	    res 1
-highbit	    res 1
-ans_1	    res 1
-ans_2	    res 1
-ans_3	    res 1
-ans_4	    res 1
-ans_5	    res 1
-ans_6	    res 1
-
 acs_ovr	access_ovr
 LCD_hex_tmp res 1   ; reserve 1 byte for variable LCD_hex_tmp	
 
@@ -175,94 +155,7 @@ lcdlp1	decf 	LCD_cnt_l,F	; no carry when 0x00 -> 0xff
 	subwfb 	LCD_cnt_h,F	; no carry when 0x00 -> 0xff
 	bc 	lcdlp1		; carry, then loop again
 	return			; carry reset so return
-	
-
-calculation movlw   low(0x04D2)
-	    movwf   low_16   
-	    movlw   high(0x04D2)
-	    movwf   high_16  
-	    movlw   0x8A
-	    movwf   eight
-	    call    conversion_1
-	    movff   temp_4, ans_1
-	    movff   temp_5, ans_2
-	    movff   temp_1, ans_3	
-	    movlw   0x41
-	    movwf   eight
-	    call    conversion_1
-	    movff   temp_4, ans_4
-	    movff   temp_5, ans_5
-	    movff   temp_1, ans_6	
-
-	    movf    ans_2, W
-	    ADDWFC  ans_4, W
-	    movwf   ans_2
 	    
-	    movf    ans_3, W
-	    ADDWFC  ans_5, W
-	    movwf   ans_3
-	    
-	    
-	    movlw   0x00
-	    addwfc  ans_6, W
-	    movwf   ans_6
-	    
-	    movf    ans_1, W
-	    movwf   0x30
-	    movf    ans_2, W
-	    movwf   0x31
-	    movf    ans_3, W
-	    movwf   0x32
-	    movf    ans_6, W
-	    movwf   0x33
-	    
-conversion_1  
-
-	    movff   eight, multiplier
-	    movff   low_16, bigthing
-	    call    multiply
-	    movff   highbit, temp_2
-	    movff   lowbit, temp_1
-	   
-
-	    movff   high_16, bigthing
-	    call    multiply
-	    movff   highbit, temp_4
-	    movff   lowbit, temp_3
-	    
-	    
-	    movf    temp_2, W
-	    ADDWFC  temp_3, W
-	    movwf   temp_5
-	    bc	    add_carry
-	    bra	    merge
-	    return
-	    
-add_carry   movlw   0x00
-	    addwfc  temp_4, W
-	    
-
-merge	    movf    temp_4, W
-	    movwf   0x30
-	    ;call    LCD_Send_Byte_D
-	    movf    temp_5, W
-	    movwf   0x31
-	    ;call    LCD_Send_Byte_D
-	    movf    temp_1, W
-	    movwf   0x32
-;	    movf    temp_2, W
-;	    movwf   0x33
-;	    movf    temp_3, W
-;	    movwf   0x34
-	    
-	    return
-	    
-	    ;call    LCD_Send_Byte_D
-multiply    movf    bigthing, W
-	    mulwf   multiplier
-	    movff   PRODH, highbit
-	    movff   PRODL, lowbit	    
-	    return  	    	    
 	    end
 
 
