@@ -84,7 +84,7 @@ fourth_count
 comparison
 	movlw	0x00	
 	movwf	temp_store
-
+	
 	movf	R_count_seq, W
 	CPFSLT	R_count
 	subwf	R_count, W
