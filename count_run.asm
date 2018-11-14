@@ -12,6 +12,10 @@ colour_ini
 	movwf	G_count_seq
 	movwf	Y_count_seq
 	movwf	B_count_seq
+	movwf	R_count
+	movwf	G_count
+	movwf	Y_count
+	movwf	B_count
 	return
 	
 count	call	colour_ini
