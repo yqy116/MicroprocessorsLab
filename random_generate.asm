@@ -1,10 +1,10 @@
 #include p18f87k22.inc
 	global	fair,read
 	global	dig_1
+	extern	int_ct
 
 
 acs0	    udata_acs
-int_ct	    res 1
 read_pos    res 1
 dig_2	    res 1
 dig_1	    res 1
