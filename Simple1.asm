@@ -6,7 +6,6 @@
 	extern	startgame, endgame, wingame ,print, counter, loop_end, buzzer, print_answer
 	extern	temp_store,colour_count_seq,colour_count, comparison
 	extern	tempo, keyboard
-	extern	R_count,G_count,Y_count,B_count,R_count_seq,G_count_seq,Y_count_seq,B_count_seq
 	extern	storage,lookup, write
 	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear, LCD_Write_Message, secondline
 	extern	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
