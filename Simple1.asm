@@ -1,9 +1,13 @@
 #include p18f87k22.inc
-
+	extern	startgame, endgame, wingame ,print, counter, loop_end
+	extern	temp_store,colour_count_seq,colour_count, comparison
+	extern	tempo, keyboard
+	extern	R_count,G_count,Y_count,B_count,R_count_seq,G_count_seq,Y_count_seq,B_count_seq
+	extern	storage,lookup, write
 	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear, LCD_Write_Message
 	extern	UART_Setup, UART_Transmit_Message
-   
-
+	global	delay
+	
 acs0    udata_acs   ; named variables in access ram
 int_ct	res 1
 pos1	res 1 ;first position for squence of colour
@@ -13,12 +17,9 @@ pos4	res 1
 dig_1	res 1
 dig_2	res 1
 read_pos res 1
-storage	res 1
 number	res 1
-adder	res 1
-tempo	res 1	
 myArray res 4 ;save answer
-counter res 1 ;count answer
+;counter res 1 ;count answer
 dumpster res 1
 temp_ans  res 1
 myinitial res 4;save initial values
@@ -34,20 +35,9 @@ not_socorrect_count res 1
 not_socorrect_temp  res 1
 temp_res_2  res 1  
 game_counter res 1
-R_count	res 1
-G_count	res 1    
-Y_count res 1
-B_count res 1
-temp_store res 1
-B_count_seq res 1
-R_count_seq res 1
-Y_count_seq res 1
-G_count_seq res 1
 total_light res 1
 y_count	res 1 
 exponent res 1
-end_mssg res 15
-word_count  res 1
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -235,66 +225,6 @@ retry	movlw	0x7E	;loop the game again
 	
 	
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE	
-	
-startTable data	    "Start Game:E"	; message, plus carriage return
-winTable data	    "You win!"	; message, plus carriage return	
-	
-myTable data	    "You lose!"	; message, plus carriage return
-
-startgame	
-	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
-	movlw	upper(startTable)	; address of data in PM
-	movwf	TBLPTRU		; load upper bits to TBLPTRU
-	movlw	high(startTable)	; address of data in PM
-	movwf	TBLPTRH		; load high byte to TBLPTRH
-	movlw	low(startTable)	; address of data in PM
-	movwf	TBLPTRL		; load low byte to TBLPTRL
-	movlw	.12
-	movwf	counter
-	movlw	0x0C
-	movwf	word_count
-	return
- 
-endgame	
-	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
-	movlw	upper(myTable)	; address of data in PM
-	movwf	TBLPTRU		; load upper bits to TBLPTRU
-	movlw	high(myTable)	; address of data in PM
-	movwf	TBLPTRH		; load high byte to TBLPTRH
-	movlw	low(myTable)	; address of data in PM
-	movwf	TBLPTRL		; load low byte to TBLPTRL
-	movlw	.10
-	movwf	counter
-	movlw	0x09
-	movwf	word_count
-	return
-
-wingame	
-	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
-	movlw	upper(winTable)	; address of data in PM
-	movwf	TBLPTRU		; load upper bits to TBLPTRU
-	movlw	high(winTable)	; address of data in PM
-	movwf	TBLPTRH		; load high byte to TBLPTRH
-	movlw	low(winTable)	; address of data in PM
-	movwf	TBLPTRL		; load low byte to TBLPTRL
-	movlw	.8
-	movwf	counter
-	movlw	0x08
-	movwf 	word_count	
-	return
-	
-loop_end
-	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
-	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
-	decfsz	counter		; count down to zero
-	bra	loop_end	; keep going until finished	
-	lfsr	FSR2, end_mssg
-	return
-print	movf	POSTINC2, W
-	call	LCD_Send_Byte_D
-	decfsz	word_count
-	goto	print
-	return
 
 buzzer	movlw	0x01
 	movwf	PORTD
@@ -357,35 +287,6 @@ mutiplier   movlw   0x02
 	    MULWF   temp_scr
 	    movff   PRODL, temp_scr
 	    return
-
-comparison
-	movlw	0x00	
-	movwf	temp_store
-
-	movf	R_count_seq, W
-	CPFSLT	R_count
-	subwf	R_count, W
-	CPFSLT	R_count
-	addwf	temp_store, f
-	
-	movf	G_count_seq, W
-	CPFSLT	G_count
-	subwf	G_count, W
-	CPFSLT	G_count
-	addwf	temp_store, f
-	
-	movf	Y_count_seq, W
-	CPFSLT	Y_count
-	subwf	Y_count, W
-	CPFSLT	Y_count
-	addwf	temp_store, f
-	
-	movf	B_count_seq, W
-	CPFSLT	B_count
-	subwf	B_count, W
-	CPFSLT	B_count
-	addwf	temp_store, f
-	return
 	
 ;CORRECT CODE
 fair	call	read
@@ -400,156 +301,11 @@ fair	call	read
 	movf	PRODL, W
 	ADDWF	dig_1, f
 	return
-
-keyboard	;banksel cannot be same line with a label,etc.start
-	banksel PADCFG1				;enable pull-ups and all that for PORTE
-	bsf	PADCFG1,RJPU,BANKED
-	movlw	0xFF
-	movwf	0x01
-	;Start the row 
-	movlw	0x0F				;gets the row byte
-	movwf	TRISJ
-	call	delay
-	movwf	PORTJ
-	call	delay
-	movf	PORTJ, W, ACCESS
-	movwf   adder
-	;Start the column			;gets the column byte
-	call	delay
-	movlw	0xF0
-	movwf	TRISJ
-	call	delay
-	movwf	PORTJ
-	call	delay
-	movf	PORTJ, W, ACCESS		;combine the row and column binary stuff and output it to portD
-	iorwf	adder, W
-	movwf	tempo
-	return
 	
 read	movff	int_ct, read_pos
 	call	LCD_delay_ms
 	return
 
-write	
-	movff	PLUSW1, storage
-	movf	storage, W
-	call	LCD_Send_Byte_D			;once it's all retrieved, write it to the LCD
-	call	LCD_delay_ms
-	call	LCD_delay_ms
-	return
-	
-	
-lookup
-	movlb	6		    ;select bank 6
-	lfsr	FSR1, 0x680	    ;point FSR1 to the middle of bank 6
-	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
-	movwf	storage
-	movlw	0x00
-	movff	storage, PLUSW1
-	
-	movlw	'G'
-	movwf	storage
-	movlw	0x01
-	movff	storage, PLUSW1
-	
-	movlw	'B'
-	movwf	storage
-	movlw	0x02
-	movff	storage, PLUSW1
-	
-	movlw	'Y'
-	movwf	storage
-	movlw	0x03
-	movff	storage, PLUSW1
-	
-	;keyin table
-	movlw	'R'		    ; load all of the ascii codes into locations +/- away from the FSR1
-	movwf	storage
-	movlw	0x77
-	movff	storage, PLUSW1
-	
-	movlw	'G'
-	movwf	storage
-	movlw	0xB7
-	movff	storage, PLUSW1
-	
-	
-	movlw	'B'
-	movwf	storage
-	movlw	0xD7
-	movff	storage, PLUSW1
-	
-	movlw	'Y'
-	movwf	storage
-	movlw	0xE7
-	movff	storage, PLUSW1
-	
-	return
-
-colour_count_seq
-	movlw	0x00
-	CPFSEQ	temp_store
-	goto	second_count_seq
-	movlw	0x01
-	addwf	R_count_seq, f
-	return
-	
-second_count_seq	
-	movlw	0x01
-	CPFSEQ	temp_store
-	goto	third_count_seq
-	movlw	0x01
-	addwf	G_count_seq, f
-	return
-	
-third_count_seq	
-	movlw	0x02
-	CPFSEQ	temp_store
-	goto	fourth_count_seq
-	movlw	0x01
-	addwf	B_count_seq, f
-	return	
-
-fourth_count_seq	
-	movlw	0x03
-	CPFSEQ	temp_store
-	return
-	movlw	0x01
-	addwf	Y_count_seq, f
-	return	
-
-colour_count
-	movlw	0x77
-	CPFSEQ	temp_store
-	goto	second_count
-	movlw	0x01
-	addwf	R_count, f
-	return
-	
-second_count	
-	movlw	0xB7
-	CPFSEQ	temp_store
-	goto	third_count
-	movlw	0x01
-	addwf	G_count, f
-	return
-	
-third_count	
-	movlw	0xD7
-	CPFSEQ	temp_store
-	goto	fourth_count
-	movlw	0x01
-	addwf	B_count, f
-	return	
-
-fourth_count	
-	movlw	0xE7
-	CPFSEQ	temp_store
-	return
-	movlw	0x01
-	addwf	Y_count, f
-	return		
-	
 delay	decfsz 0x01 ; decrement until zero
 	bra delay
 	return
