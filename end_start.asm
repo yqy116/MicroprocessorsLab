@@ -10,9 +10,9 @@ acs_ovr	access_ovr
 
 input	code
 	
-startTable data	    "Start Game:E"	; message, plus carriage return
+startTable data	    "Start:Press E"	; message, plus carriage return
 winTable data	    "You win!"	; message, plus carriage return		
-myTable data	    "You lose!"	; message, plus carriage return
+myTable data	    "You lose!Ans is:"	; message, plus carriage return
  
 startgame	
 	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
@@ -22,9 +22,9 @@ startgame
 	movwf	TBLPTRH		; load high byte to TBLPTRH
 	movlw	low(startTable)	; address of data in PM
 	movwf	TBLPTRL		; load low byte to TBLPTRL
-	movlw	.12
+	movlw	.13
 	movwf	counter
-	movlw	0x0C
+	movlw	0x0d
 	movwf	word_count
 	return
  
@@ -36,9 +36,9 @@ endgame
 	movwf	TBLPTRH		; load high byte to TBLPTRH
 	movlw	low(myTable)	; address of data in PM
 	movwf	TBLPTRL		; load low byte to TBLPTRL
-	movlw	.10
+	movlw	.16
 	movwf	counter
-	movlw	0x09
+	movlw	0x10
 	movwf	word_count
 	return
 
