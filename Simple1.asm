@@ -1,5 +1,6 @@
 #include p18f87k22.inc
 	extern	fair,read
+	extern	keyin
 	extern	count
 	extern	dig_1
 	extern	startgame, endgame, wingame ,print, counter, loop_end, buzzer, print_answer
@@ -107,36 +108,8 @@ check	movlw	0xff
 	call	count
 
 ;key in guess
-;answering
-;	call	keyin
-keyin	call	LCD_Clear
-	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
-	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
-	bsf INTCON,TMR0IE ; Enable timer0 interrupt
-	bsf INTCON,GIE ; Enable all interrupts
-	lfsr FSR0, myArray 
-	movlw	0x04
-	movwf	counter
-	
-loop	movlw	0xff
-	CPFSEQ	tempo
-	goto	answ
-	goto	loop
-	
-answ	movlw	0xEE
-	CPFSEQ	tempo
-	goto	accept
-	goto	keyin
-
-accept	movf	tempo, W
-	movff	tempo, temp_store
-	movff	tempo, POSTINC0
-	call	write
-	call	colour_count
-	
-back	decfsz  counter
-	goto	loop
-	goto	initial
+answering
+	call	keyin
 	
 initial	;All kind of initialization
 	movlw	0x00
@@ -182,13 +155,11 @@ restart	lfsr	FSR2, myArray
 	goto	back_game
 
 back_game
-	movlw	.5	    ;Need some time before it clear
-	call	LCD_delay_ms
 	call	LCD_Clear
 	movlw	.5	    ;Need some time before it clear
 	call	LCD_delay_ms
 	decfsz	game_counter
-	goto	keyin
+	goto	answering
 	call	endgame
 	call	loop_end
 	call	print
