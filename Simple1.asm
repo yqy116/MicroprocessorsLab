@@ -82,6 +82,7 @@ check
 	lfsr    FSR2, myinitial
 	call	lookup				;initialise the lookup table
 	
+	;will remove the write at end of game
 	movlb	0				;select bank 0 so the access bank is used again
 	movf	pos1, W				;use the pressed button to obtain the data from bank6
 	movwf	POSTINC2
@@ -106,10 +107,8 @@ check
 	movff	pos4, temp_store
 	call	colour_count_seq
 	goto	keyin
-		
 	
 keyin	call	LCD_Clear
-	movlw	.5
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
