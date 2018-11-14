@@ -1,71 +1,70 @@
-	    #include p18f87k22.inc
-	    
-extern  LCD_Setup, LCD_Write_Message, LCD_Send_Byte_D	
-global	conversion_1, merge	    
-	code
-	org 0x0
-	goto	conversion
+#include p18f87k22.inc
 	
-	org 0x100		    ; Main code starts here at address 0x100    
+	global startgame, endgame, wingame ,print, counter, loop_end
+	    
+acs0	    udata_acs
+counter	    res 1 
+word_count  res 1 
+end_mssg res 15
+ 
+startTable data	    "Start Game:E"	; message, plus carriage return
+winTable data	    "You win!"	; message, plus carriage return		
+myTable data	    "You lose!"	; message, plus carriage return
+ 
+startgame	
+	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
+	movlw	upper(startTable)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(startTable)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(startTable)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	.12
+	movwf	counter
+	movlw	0x0C
+	movwf	word_count
+	return
+ 
+endgame	
+	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
+	movlw	upper(myTable)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(myTable)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(myTable)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	.10
+	movwf	counter
+	movlw	0x09
+	movwf	word_count
+	return
+
+wingame	
+	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
+	movlw	upper(winTable)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(winTable)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(winTable)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	.8
+	movwf	counter
+	movlw	0x08
+	movwf 	word_count	
+	return
+
+loop_end
+	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	decfsz	counter		; count down to zero
+	bra	loop_end	; keep going until finished	
+	lfsr	FSR2, end_mssg
+	return	
 	
-high_16	    res 1
-low_16	    res	1
-eight	    res	1    
-temp_1	    res	1
-temp_2	    res	1
-temp_3	    res	1
-temp_4	    res	1
-temp_5	    res 1
-carry	    res 1
-upper_24    res 1
-high_24	    res 1
-low_24	    res	1
-myArray	    0x40
-	    
-conversion_1  
-	    movlw   low(0x418A)
-	    movwf   low_16
-	    movlw   high(0x418A)
-	    movwf   high_16
-	    movlw   0x0A
-	    movwf   eight
-	    
-	    movf    low_16, W
-	    mulwf   eight
-	    movff   PRODH, temp_2
-	    movff   PRODL, temp_1
-	    
-	    movlw   high_16
-	    mulwf   eight
-	    movff   PRODH, temp_4
-	    movff   PRODL, temp_3
-	    
-	    movlw   temp_2
-	    ADDWFC  temp_3, W
-	    movwf   temp_5
-	    bc	    add_carry
-	    bra	    merge
+print	movf	POSTINC2, W
+	call	LCD_Send_Byte_D
+	decfsz	word_count
+	goto	print
+	return	
 
-
-add_carry   movlw   0x00
-	    addwfc   temp_4, W
-	    
-
-merge	    movf    temp_4, W
-	    call    LCD_Send_Byte_D
-	    movf    temp_5, W
-	    call    LCD_Send_Byte_D
-	    movf    temp_1, W
-	    call    LCD_Send_Byte_D
-	    
-	    return
-	    end
-;	    lfsr    FSR1, myArray
-;	    movwf   TBLPTRU	
-;	    movff   temp_5, TBLPTRH
-;	    movff   temp_1, TBLPTRL
-
-;multiply    movf    constant1, W
-;	    mulwf   eight
-;	    movff   PRODH, constant2
-;	    movff   PRODL, constant3
+end
