@@ -1,12 +1,15 @@
 #include p18f87k22.inc
-	
+	extern LCD_Send_Byte_D
 	global startgame, endgame, wingame ,print, counter, loop_end
 	    
 acs0	    udata_acs
 counter	    res 1 
 word_count  res 1 
 end_mssg res 15
- 
+acs_ovr	access_ovr
+
+input	code
+	
 startTable data	    "Start Game:E"	; message, plus carriage return
 winTable data	    "You win!"	; message, plus carriage return		
 myTable data	    "You lose!"	; message, plus carriage return
