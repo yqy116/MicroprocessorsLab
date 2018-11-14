@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 	extern LCD_Send_Byte_D, LCD_delay_ms
-	global startgame, endgame, wingame ,print, counter, loop_end
+	global startgame, endgame, wingame ,print, counter, loop_end, buzzer
 	    
 acs0	    udata_acs
 counter	    res 1 
