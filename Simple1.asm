@@ -1,10 +1,12 @@
 #include p18f87k22.inc
-	extern	startgame, endgame, wingame ,print, counter, loop_end
+	extern	startgame, endgame, wingame ,print, counter, loop_end, buzzer
 	extern	temp_store,colour_count_seq,colour_count, comparison
 	extern	tempo, keyboard
 	extern	R_count,G_count,Y_count,B_count,R_count_seq,G_count_seq,Y_count_seq,B_count_seq
 	extern	storage,lookup, write
 	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear, LCD_Write_Message
+	extern	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
+	extern	validate,add_z,binary_z,iter,mutiplier
 	extern	UART_Setup, UART_Transmit_Message
 	global	delay
 	
@@ -21,23 +23,11 @@ number	res 1
 myArray res 4 ;save answer
 ;counter res 1 ;count answer
 dumpster res 1
-temp_ans  res 1
 myinitial res 4;save initial values
 pos_counter res 1   ;the position 
-ans_pos	res 1	    ;key in position
-ran_pos	res 1	    ;rsequence position
 scoring	res 1
-temp_pst res 1
-temp_scr res 1
-temp_res res 1
-correct_count res 1
-not_socorrect_count res 1
-not_socorrect_temp  res 1
-temp_res_2  res 1  
 game_counter res 1
-total_light res 1
-y_count	res 1 
-exponent res 1
+
  
 rst	code 0x0000 ; reset vector	
 	call LCD_Setup	
@@ -225,68 +215,6 @@ retry	movlw	0x7E	;loop the game again
 	
 	
 ;EVERYTHING HERE ONWARDS IS SUBROUTINE	
-
-buzzer	movlw	0x01
-	movwf	PORTD
-	movlw	0xf0
-	call	LCD_delay_ms
-	call	LCD_delay_ms
-	clrf	PORTD
-	return
-	
-add_z	decfsz	total_light
-	goto	binary_z
-	return
-	
-binary_z 
-	movlw	0x01
-	movwf	temp_scr
-	movff	total_light,exponent
-	movlw	0x04
-	addwf	exponent,f
-	movff	exponent,temp_pst
-	call	iter
-	movf	temp_scr, W
-	addwf	temp_res, f
-	goto	add_z	
-
-validate
-	movf	POSTINC0, W	;key in answer
-	movff	PLUSW1, storage
-	movf	storage, W
-	movwf	temp_ans	
-	;call	LCD_Send_Byte_D	 ;error checking
-	movf	POSTINC2, W 	;initial sequence
-	movff	PLUSW1, storage
-	movf	storage, W
-	;call	LCD_Send_Byte_D	 ;error checking
-	CPFSEQ	temp_ans
-	return
-	call	cor_pos	
-	return
-
-cor_pos	movlw	0x01
-	movwf	temp_scr
-	addwf	y_count
-	movff	y_count,temp_pst
-	call	iter
-	movf	temp_scr, W
-	addwf	temp_res
-	return
-	
-iter	decf	temp_pst
-	movlw	0x00
-	CPFSEQ	temp_pst
-	call    mutiplier	
-	movlw	0x00
-	CPFSEQ	temp_pst
-	bra	iter
-	return	
-	
-mutiplier   movlw   0x02
-	    MULWF   temp_scr
-	    movff   PRODL, temp_scr
-	    return
 	
 ;CORRECT CODE
 fair	call	read
