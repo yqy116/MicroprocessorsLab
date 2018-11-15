@@ -10,6 +10,7 @@ total_light	res 1
 pos_counter	res 1
 acs_ovr	access_ovr
 	
+validate_1  code
 	
 initial;All kind of initialization
 	movlw	0x00
