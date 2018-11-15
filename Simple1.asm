@@ -112,8 +112,7 @@ after_y	call	comparison
 	addwf	y_count,W
 	subwf	total_light, f
 	movff	total_light, count_orange
-	movlw	0x01
-	addwf	total_light,f
+	incf	total_light
 	call	add_z
 	clrf	TRISH
 	movf	temp_res, W
