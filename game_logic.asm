@@ -40,14 +40,14 @@ cor_pos	movlw	0x01
 	addwf	temp_res
 	return
 
-add_z	decfsz	total_light
+add_z	decfsz	count_orange
 	goto	binary_z
 	return
 	
 binary_z 
 	movlw	0x01
 	movwf	temp_scr
-	movff	total_light,exponent
+	movff	count_orange,exponent
 	movlw	0x04
 	addwf	exponent,f
 	movff	exponent,temp_pst
