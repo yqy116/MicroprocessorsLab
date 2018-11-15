@@ -33,16 +33,15 @@ int_hi	code 0x0008 ; high vector, no low vector
 	goto	second
 	incf	LATD
 	incf	int_ct
-	movlw	.1
 	;retfie FAST ; if not then return
-	call	keyboard
+	;call	keyboard
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
 second	btfss PIR1,TMR1IF
 	retfie FAST
 	incf	int_ct
-	;incf	LATD
+	incf	LATH
 	bcf PIR1,TMR1IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 	
@@ -52,13 +51,19 @@ start	call UART_Setup
 	clrf LATD ; Clear PORTD outputs
 	clrf LATE
 	clrf LATC
+	clrf LATH
+	clrf TRISH ;test
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
-	movlw b'01111001' ; Set timer0 to 16-bit, Fosc/4/256
+	movlw b'00110101' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T1CON 
+        movlw b'00000000' ; Set timer0 to 16-bit, Fosc/4/256
+	movwf T1GCON 
+
 	bsf PIE1, TMR1IE ; Enable timer1 interrupt
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
+	bsf INTCON,PEIE 
 	call	startgame
 	call	loop_end
 	call	print
@@ -105,7 +110,7 @@ check	movlw	0xff
 	movwf	POSTINC2
 	call	write	
 	call	count
-
+	goto	$
 ;key in guess
 answering
 	call	keyin
