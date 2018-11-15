@@ -15,6 +15,7 @@ acs_ovr	access_ovr
 	
 match_colour code	
 
+;count the initial
 colour_count_seq
 	movlw	0x00
 	CPFSEQ	temp_store
@@ -44,6 +45,7 @@ fourth_count_seq
 	addwf	Y_count_seq, f
 	return	
 
+;count the guess
 colour_count
 	movlw	0x77
 	CPFSEQ	temp_store
