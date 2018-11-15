@@ -123,6 +123,7 @@ initial	;All kind of initialization
 	movlw	0x00
 	movwf	temp_res
 	movwf	y_count
+	movwf	temp_pst
 	lfsr    FSR0, myArray 
 	lfsr    FSR2, myinitial
 	movlw	0x04
