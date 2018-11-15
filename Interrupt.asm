@@ -17,7 +17,7 @@ second	btfss PIR1,TMR1IF
 	bcf PIR1,TMR1IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt	
 	
-code
+interrupt code
 	
 interrupt_setup
 	movlw b'00000100' ; Close timer 1, when repeat apparently not closed
