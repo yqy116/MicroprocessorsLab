@@ -33,18 +33,14 @@ rst	code 0x0000 ; reset vector
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
 	goto	 second
-	;retfie FAST
 	movlw	.1
 	movwf	TMR0L
 	incf	int_ct
-	incf	LATD
-	;retfie FAST ; if not then return
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
 second	btfss PIR1,TMR1IF
 	retfie FAST
-	;incf	LATH
 	call	keyboard
 	bcf PIR1,TMR1IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
@@ -56,6 +52,8 @@ start	call UART_Setup
 	clrf LATE
 	clrf LATC
 	clrf LATH
+	movlw b'00000100' ; Close timer 1, when repeat apparently not closed
+	movwf T1CON 
 	;clrf TRISH ;test
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
@@ -88,7 +86,7 @@ check	call	keyboard
 	;stop interupt
 	movlw	b'00000000'
 	movwf	T0CON
-	
+	;start interrupt 1
 	movlw b'00000101' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T1CON 
         movlw b'00000000' ; Set timer0 to 16-bit, Fosc/4/256
