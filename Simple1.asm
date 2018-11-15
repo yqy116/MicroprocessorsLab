@@ -1,8 +1,7 @@
 #include p18f87k22.inc
-	extern	fair,read
+	extern	generate, read
 	extern	keyin
 	extern	count
-	extern	dig_1
 	extern	startgame, endgame, wingame ,print, counter, loop_end, buzzer, print_answer
 	extern	temp_store,colour_count_seq,colour_count, comparison
 	extern	tempo, keyboard
@@ -25,12 +24,12 @@ game_counter res 1  ;the loop of game
 read_count  res	1
 
  
-rst	code 0x0000 ; reset vector	
-	call LCD_Setup	
+rst	code 0x0000 ; reset vector		
 	goto start
 	
 main	code
 start	call UART_Setup
+	call LCD_Setup
 	clrf TRISD ; Set PORTD as all outputs
 	clrf LATD ; Clear PORTD outputs
 	clrf LATE
@@ -40,6 +39,7 @@ start	call UART_Setup
 	call	startgame
 	call	loop_end
 	call	print
+
 check	call	keyboard
 ;	movlw	0xff
 ;	CPFSEQ	PORTE
@@ -50,26 +50,8 @@ check	call	keyboard
 	movlw	.5
 	call	LCD_delay_ms
 	;Start reading the values
-	lfsr    FSR2, myinitial
-	call	fair
-	movff	dig_1, POSTINC2
-	call	fair
-	movff	dig_1, POSTINC2
-	call	fair
-	movff	dig_1, POSTINC2
-	call	fair
-	movff	dig_1, POSTINC2
-
-	;stop interupt
-	movlw	b'00000000'
-	movwf	T0CON
-	;start interrupt 1
-	movlw b'00000101' ; Set timer0 to 16-bit, Fosc/4/256
-	movwf T1CON 
-        movlw b'00000000' ; Set timer0 to 16-bit, Fosc/4/256
-	movwf T1GCON 
-
-	bsf PIE1, TMR1IE ; Enable timer1 interrupt
+	call	generate    ;generate random number
+	call	interrupt_1 ;start interrupt_1,stop interrupt_0
 	;intialise
 	movlw	0x05
 	movwf	game_counter
