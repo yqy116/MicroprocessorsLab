@@ -27,6 +27,6 @@ interrupt_setup
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
 	bsf INTCON,PEIE 
-	
+	return
 	
 end
