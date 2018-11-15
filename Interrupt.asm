@@ -1,6 +1,10 @@
 #include p18f87k22.inc
-	global	interrupt_setup, interrupt_1,stop_timer_2
-	extern	int_ct,keyboard
+	global	interrupt_setup, interrupt_1,stop_timer_2,int_ct
+	extern	keyboard
+
+acs0	    udata_acs
+int_ct	res 1	
+acs_ovr	access_ovr	
 	
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
