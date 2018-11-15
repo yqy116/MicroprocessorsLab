@@ -12,6 +12,7 @@
 	extern	validate,add_z,binary_z,iter,mutiplier
 	extern	UART_Setup, UART_Transmit_Message
 	global	int_ct,pos1,pos2,pos3,pos4,myArray, myinitial
+	extern	UART_Transmit_Byte
 	
 acs0    udata_acs   ; named variables in access ram
 int_ct	res 1
@@ -30,18 +31,21 @@ rst	code 0x0000 ; reset vector
 	goto start
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
-	goto	second
-	incf	LATD
+	goto	 second
+	;retfie FAST
+	movlw	.1
+	movwf	TMR0L
 	incf	int_ct
+	incf	LATD
 	;retfie FAST ; if not then return
-	;call	keyboard
+	call	keyboard
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
 second	btfss PIR1,TMR1IF
 	retfie FAST
+	;incf	LATH
 	incf	int_ct
-	incf	LATH
 	bcf PIR1,TMR1IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 	
@@ -52,10 +56,10 @@ start	call UART_Setup
 	clrf LATE
 	clrf LATC
 	clrf LATH
-	clrf TRISH ;test
-	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
+	;clrf TRISH ;test
+	movlw b'10000111' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
-	movlw b'00110101' ; Set timer0 to 16-bit, Fosc/4/256
+	movlw b'00000101' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T1CON 
         movlw b'00000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T1GCON 
@@ -110,7 +114,7 @@ check	movlw	0xff
 	movwf	POSTINC2
 	call	write	
 	call	count
-	goto	$
+
 ;key in guess
 answering
 	call	keyin
@@ -148,16 +152,29 @@ after_y	call	comparison
 	call	buzzer
 	movlw	0x04
 	CPFSEQ	y_count	    ;win condition
-	goto	restart
+	call	UART_loop
+	CPFSEQ	y_count	    ;win condition
+	goto	back_game
 	call	wingame
 	call	loop_end
 	call	print
 	goto	retry
 
-restart	lfsr	FSR2, myArray
-	call	UART_Transmit_Message
-	goto	back_game
-
+UART_loop
+	movlw	.4	    ;UART initialize
+	movwf	temp_store
+	lfsr	FSR2, myArray
+	call	restart
+	decfsz	temp_store
+	goto	UART_loop	
+	return
+restart	
+	movf    POSTINC2, W
+	movff	PLUSW1, storage
+	movf	storage, W
+	call    UART_Transmit_Byte
+	return	
+	
 back_game
 	call	LCD_Clear
 	movlw	.5	    ;Need some time before it clear
