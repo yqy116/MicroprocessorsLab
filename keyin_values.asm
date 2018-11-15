@@ -32,7 +32,7 @@ answ	movlw	0xEE
 
 accept	movf	tempo, W
 	movff	tempo, temp_store
-	movff	tempo, POSTINC0
+	movwf	POSTINC0
 	call	write
 	call	colour_count
 	
