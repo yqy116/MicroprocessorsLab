@@ -1,16 +1,13 @@
 #include p18f87k22.inc
 	global	validate,add_z,binary_z,iter,mutiplier
-	global	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
-	extern	storage
+	global	temp_ans,temp_scr,temp_pst
+	extern	storage, y_count, temp_res, total_light
 	
 acs0	    udata_acs
 temp_ans	res 1
-temp_res	res 1
 temp_scr	res 1	
-total_light	res 1
 exponent	res 1
 temp_pst	res 1
-y_count		res 1
 acs_ovr	access_ovr
 	
 	
