@@ -11,15 +11,11 @@
 	extern	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
 	extern	validate,add_z,binary_z,iter,mutiplier
 	extern	UART_Setup, UART_Transmit_Message
-	global	int_ct,pos1,pos2,pos3,pos4,myArray, myinitial, count_orange
+	global	int_ct,myArray, myinitial, count_orange
 	extern	UART_loop
 	
 acs0    udata_acs   ; named variables in access ram
 int_ct	res 1
-pos1	res 1 ;first position for squence of colour
-pos2	res 1 ;second position for squence of colour
-pos3	res 1 ;so on
-pos4	res 1
 myArray res 4 ;save answer
 myinitial res 4;save initial values
 count_orange	res 1; save number for orange led
@@ -54,7 +50,6 @@ start	call UART_Setup
 	clrf LATH
 	movlw b'00000100' ; Close timer 1, when repeat apparently not closed
 	movwf T1CON 
-	;clrf TRISH ;test
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
 
@@ -74,14 +69,15 @@ check	call	keyboard
 	movlw	.5
 	call	LCD_delay_ms
 	;Start reading the values
+	lfsr    FSR2, myinitial
 	call	fair
-	movff	dig_1, pos1
+	movff	dig_1, POSTINC2
 	call	fair
-	movff	dig_1, pos2
+	movff	dig_1, POSTINC2
 	call	fair
-	movff	dig_1, pos3
+	movff	dig_1, POSTINC2
 	call	fair
-	movff	dig_1, pos4
+	movff	dig_1, POSTINC2
 
 	;stop interupt
 	movlw	b'00000000'
@@ -98,21 +94,18 @@ check	call	keyboard
 	movwf	game_counter
 	call	lookup				;initialise the lookup table
 	movlb	0
+	
 	lfsr    FSR2, myinitial
-
 	;will remove the write at end of game
-	movf	pos1, W				;use the pressed button to obtain the data from bank6
-	movwf	POSTINC2
+	movf	POSTINC2, W				;use the pressed button to obtain the data from bank6
 	call	write
-	movf	pos2, W	
-	movwf	POSTINC2
+	movf	POSTINC2, W	
 	call	write
-	movf	pos3, W	
-	movwf	POSTINC2
+	movf	POSTINC2, W	
 	call	write
-	movf	pos4, W	
-	movwf	POSTINC2
+	movf	POSTINC2, W	
 	call	write	
+	lfsr    FSR2, myinitial
 	call	count
 
 ;key in guess
@@ -147,6 +140,7 @@ after_y	call	comparison
 	addwf	total_light,f
 	call	add_z
 	clrf	TRISH
+	movf	temp_res, W
 	movff	temp_res, PORTH
 	movlw	0x04
 	CPFSGT	y_count	    ;lose condition
@@ -182,8 +176,7 @@ show	call	print_answer
 	goto	show
 	goto	retry
 
-retry	;call	keyboard
-	movlw	0x7E	;loop the game again
+retry	movlw	0x7E	;loop the game again
 	CPFSEQ	tempo
 	goto	retry
 	call	LCD_Clear
