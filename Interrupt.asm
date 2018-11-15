@@ -28,5 +28,15 @@ interrupt_setup
 	bsf INTCON,GIE ; Enable all interrupts
 	bsf INTCON,PEIE 
 	return
-	
+interrupt_1
+	;stop interupt
+	movlw	b'00000000'
+	movwf	T0CON
+	;start interrupt 1
+	movlw b'00000101' ; Set timer0 to 16-bit, Fosc/4/256
+	movwf T1CON 
+        movlw b'00000000' ; Set timer0 to 16-bit, Fosc/4/256
+	movwf T1GCON 	
+	bsf PIE1, TMR1IE ; Enable timer1 interrupt
+	return
 end
