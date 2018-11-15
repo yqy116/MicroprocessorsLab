@@ -10,10 +10,10 @@
 	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear, LCD_Write_Message, secondline
 	extern	y_count
 	extern	UART_Setup, UART_Transmit_Message
-	global	int_ct,myArray, myinitial
 	extern	UART_loop
 	extern	interrupt_setup, interrupt_1
 	extern	after_y
+	global	int_ct,myArray, myinitial
 	
 acs0    udata_acs   ; named variables in access ram
 int_ct	res 1
@@ -100,7 +100,7 @@ calculate_validate
 	movlw	0x04
 	movwf	temp_store  ;UART initialize
 	CPFSEQ	y_count	    ;win condition
-	call	UART_loop
+	call	UART_loop   ;if didn't win, save result and guess through uart
 	CPFSEQ	y_count	    ;win condition
 	goto	back_game
 	call	wingame
