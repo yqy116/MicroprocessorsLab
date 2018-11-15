@@ -2,6 +2,7 @@
 	extern	generate, read
 	extern	keyin
 	extern	count
+	extern	initial
 	extern	startgame, endgame, wingame ,print, counter, loop_end, buzzer, print_answer
 	extern	temp_store,colour_count_seq,colour_count, comparison
 	extern	tempo, keyboard
@@ -12,7 +13,7 @@
 	extern	UART_Setup, UART_Transmit_Message
 	global	int_ct,myArray, myinitial, count_orange
 	extern	UART_loop
-	extern	interrupt_setup
+	extern	interrupt_setup, interrupt_1
 	
 acs0    udata_acs   ; named variables in access ram
 int_ct	res 1
@@ -87,26 +88,9 @@ answering
 	movff	PLUSW1, storage
 	movf	storage, W
 	call	LCD_Send_Byte_D	
-	goto	$
-	
-initial	;All kind of initialization
-	movlw	0x00
-	movwf	temp_res
-	movwf	y_count
-	movwf	temp_pst
-	lfsr    FSR0, myArray 
-	lfsr    FSR2, myinitial
-	movlw	0x04
-	movwf	pos_counter ;number of loop
-	movwf	total_light
-	call	LCD_Clear
-	movlw	.5	    ;Need some time before it clear
-	call	LCD_delay_ms
 
-testtest	
-	call	validate
-	decfsz  pos_counter 
-	goto	testtest
+calculate_validate
+	call	initial
 	
 after_y	call	comparison
 	movf	temp_store,W
