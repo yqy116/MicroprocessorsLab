@@ -8,12 +8,12 @@
 	extern	tempo, keyboard
 	extern	storage,lookup, write
 	extern	LCD_Setup, LCD_Send_Byte_D ,LCD_delay_ms, LCD_Clear, LCD_Write_Message, secondline
-	extern	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
-	extern	validate,add_z,binary_z,iter,mutiplier
+	extern	y_count
 	extern	UART_Setup, UART_Transmit_Message
-	global	int_ct,myArray, myinitial, count_orange
+	global	int_ct,myArray, myinitial
 	extern	UART_loop
 	extern	interrupt_setup, interrupt_1
+	extern	after_y
 	
 acs0    udata_acs   ; named variables in access ram
 int_ct	res 1
@@ -90,18 +90,9 @@ answering
 	call	LCD_Send_Byte_D	
 
 calculate_validate
-	call	initial
+	call	initial	;initialization to green(yes) calculation
+	call	after_y	;from yellow light to show result in port H
 	
-after_y	call	comparison
-	movf	temp_store,W
-	addwf	y_count,W
-	subwf	total_light, f
-	movff	total_light, count_orange
-	incf	total_light
-	call	add_z
-	clrf	TRISH
-	movf	temp_res, W
-	movff	temp_res, PORTH
 	movlw	0x04
 	CPFSGT	y_count	    ;lose condition
 	call	buzzer
