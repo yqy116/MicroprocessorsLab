@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 	extern LCD_Send_Byte_D, LCD_delay_ms, write
-	global startgame, endgame, wingame ,print, counter, loop_end, buzzer, print_answer
+	global startgame, endgame, wingame , counter, buzzer, print_answer
 	    
 acs0	    udata_acs
 counter	    res 1 
@@ -26,7 +26,7 @@ startgame
 	movwf	counter
 	movlw	0x0d
 	movwf	word_count
-	return
+	goto	loop_end
  
 endgame	
 	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
@@ -40,7 +40,7 @@ endgame
 	movwf	counter
 	movlw	0x10
 	movwf	word_count
-	return
+	goto	loop_end
 
 wingame	
 	lfsr	FSR0, end_mssg	; Load FSR0 with address in RAM	
@@ -54,7 +54,7 @@ wingame
 	movwf	counter
 	movlw	0x08
 	movwf 	word_count	
-	return
+	goto	loop_end
 
 loop_end
 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
@@ -62,7 +62,7 @@ loop_end
 	decfsz	counter		; count down to zero
 	bra	loop_end	; keep going until finished	
 	lfsr	FSR2, end_mssg
-	return	
+	goto	print	
 	
 print	movf	POSTINC2, W
 	call	LCD_Send_Byte_D
