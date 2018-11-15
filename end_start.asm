@@ -1,9 +1,9 @@
 #include p18f87k22.inc
-	extern LCD_Send_Byte_D, LCD_delay_ms, write
-	global startgame, endgame, wingame , counter, buzzer, print_answer
+	extern	LCD_Send_Byte_D, LCD_delay_ms, write
+	extern	temp_store
+	global	startgame, endgame, wingame, buzzer, print_answer
 	    
 acs0	    udata_acs
-counter	    res 1 
 word_count  res 1 
 end_mssg res 15
 acs_ovr	access_ovr
@@ -23,7 +23,7 @@ startgame
 	movlw	low(startTable)	; address of data in PM
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	.13
-	movwf	counter
+	movwf	temp_store
 	movlw	0x0d
 	movwf	word_count
 	goto	loop_end
@@ -37,7 +37,7 @@ endgame
 	movlw	low(myTable)	; address of data in PM
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	.16
-	movwf	counter
+	movwf	temp_store
 	movlw	0x10
 	movwf	word_count
 	goto	loop_end
@@ -51,7 +51,7 @@ wingame
 	movlw	low(winTable)	; address of data in PM
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	.8
-	movwf	counter
+	movwf	temp_store
 	movlw	0x08
 	movwf 	word_count	
 	goto	loop_end
@@ -59,7 +59,7 @@ wingame
 loop_end
 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
-	decfsz	counter		; count down to zero
+	decfsz	temp_store	; count down to zero
 	bra	loop_end	; keep going until finished	
 	lfsr	FSR2, end_mssg
 	goto	print	
