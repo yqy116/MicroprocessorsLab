@@ -1,5 +1,5 @@
 #include p18f87k22.inc
-	global	interrupt_setup, interrupt_1
+	global	interrupt_setup, interrupt_1,stop_timer_2
 	extern	int_ct,keyboard
 	
 int_hi	code 0x0008 ; high vector, no low vector
@@ -28,11 +28,15 @@ interrupt_setup
 	bsf INTCON,GIE ; Enable all interrupts
 	bsf INTCON,PEIE 
 	return
-	
-interrupt_1
+
+stop_timer_1
 	;stop interupt
 	movlw	b'00000000'
 	movwf	T0CON
+	return
+	
+interrupt_1
+	call	stop_timer_1
 	;start interrupt 1
 	movlw b'00000101' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T1CON 
@@ -40,4 +44,11 @@ interrupt_1
 	movwf T1GCON 	
 	bsf PIE1, TMR1IE ; Enable timer1 interrupt
 	return
+
+stop_timer_2
+	;stop interupt
+	movlw	b'00000000'
+	movwf	T1CON
+	return	
+	
 end
