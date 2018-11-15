@@ -21,6 +21,7 @@ myinitial res 4;save initial values
 count_orange	res 1; save number for orange led
 pos_counter res 1   ;the logic position 
 game_counter res 1  ;the loop of game
+read_count  res	1
 
  
 rst	code 0x0000 ; reset vector	
@@ -96,15 +97,14 @@ check	call	keyboard
 	movlb	0
 	
 	lfsr    FSR2, myinitial
+	movlw	0x04
+	movwf	read_count
 	;will remove the write at end of game
-	movf	POSTINC2, W				;use the pressed button to obtain the data from bank6
-	call	write
-	movf	POSTINC2, W	
-	call	write
-	movf	POSTINC2, W	
-	call	write
-	movf	POSTINC2, W	
-	call	write	
+trial_loop	
+	call	write_ans
+	decfsz	read_count
+	goto	trial_loop
+	
 	lfsr    FSR2, myinitial
 	call	count
 
@@ -185,6 +185,11 @@ retry	movlw	0x7E	;loop the game again
 	clrf	PORTH 
 	goto	start	
 
+write_ans
+	movf	POSTINC2, W				;use the pressed button to obtain the data from bank6
+	call	write
+	return
+	
 	end
 
 
