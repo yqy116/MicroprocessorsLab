@@ -40,12 +40,14 @@ start	call UART_Setup
 	call	loop_end
 	call	print
 
-check	call	keyboard
+enter	call	keyboard
 ;	movlw	0xff
 ;	CPFSEQ	PORTE
 	movlw	0xEB
 	CPFSEQ	tempo
-	bra	check	
+	bra	enter	
+
+Initialise_sequence
 	call	LCD_Clear
 	movlw	.5
 	call	LCD_delay_ms
