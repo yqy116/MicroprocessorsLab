@@ -33,7 +33,6 @@ start	call UART_Setup
 	clrf TRISD ; Set PORTD as all outputs
 	clrf LATD ; Clear PORTD outputs
 	clrf LATE
-	clrf LATC
 	clrf LATH
 	call	interrupt_setup
 	call	startgame
