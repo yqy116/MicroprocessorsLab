@@ -88,6 +88,7 @@ answering
 	movf	storage, W
 	call	LCD_Send_Byte_D	
 	goto	$
+	
 initial	;All kind of initialization
 	movlw	0x00
 	movwf	temp_res
