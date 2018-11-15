@@ -1,7 +1,7 @@
 #include p18f87k22.inc
 	global	count
 	extern	colour_count_seq,R_count_seq,G_count_seq,Y_count_seq,B_count_seq
-	extern	temp_store,pos1,pos2,pos3,pos4
+	extern	temp_store
 
 	
 
@@ -16,13 +16,13 @@ colour_ini
 	return
 	
 count	call	colour_ini
-	movff	pos1, temp_store
+	movff	POSTINC2, temp_store
 	call	colour_count_seq
-	movff	pos2, temp_store
+	movff	POSTINC2, temp_store
 	call	colour_count_seq
-	movff	pos3, temp_store
+	movff	POSTINC2, temp_store
 	call	colour_count_seq
-	movff	pos4, temp_store
+	movff	POSTINC2, temp_store
 	call	colour_count_seq
 	return
 	
