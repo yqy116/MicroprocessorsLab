@@ -11,8 +11,8 @@
 	extern	temp_ans,temp_scr,total_light,temp_pst,y_count,temp_res
 	extern	validate,add_z,binary_z,iter,mutiplier
 	extern	UART_Setup, UART_Transmit_Message
-	global	int_ct,pos1,pos2,pos3,pos4,myArray, myinitial
-	extern	UART_Transmit_Byte
+	global	int_ct,pos1,pos2,pos3,pos4,myArray, myinitial, count_orange
+	extern	UART_loop
 	
 acs0    udata_acs   ; named variables in access ram
 int_ct	res 1
@@ -22,6 +22,7 @@ pos3	res 1 ;so on
 pos4	res 1
 myArray res 4 ;save answer
 myinitial res 4;save initial values
+count_orange	res 1; save number for orange led
 pos_counter res 1   ;the logic position 
 game_counter res 1  ;the loop of game
 
@@ -38,14 +39,13 @@ int_hi	code 0x0008 ; high vector, no low vector
 	incf	int_ct
 	incf	LATD
 	;retfie FAST ; if not then return
-	call	keyboard
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
 second	btfss PIR1,TMR1IF
 	retfie FAST
 	;incf	LATH
-	incf	int_ct
+	call	keyboard
 	bcf PIR1,TMR1IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 	
@@ -57,24 +57,20 @@ start	call UART_Setup
 	clrf LATC
 	clrf LATH
 	;clrf TRISH ;test
-	movlw b'10000111' ; Set timer0 to 16-bit, Fosc/4/256
+	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
-	movlw b'00000101' ; Set timer0 to 16-bit, Fosc/4/256
-	movwf T1CON 
-        movlw b'00000000' ; Set timer0 to 16-bit, Fosc/4/256
-	movwf T1GCON 
 
-	bsf PIE1, TMR1IE ; Enable timer1 interrupt
 	bsf INTCON,TMR0IE ; Enable timer0 interrupt
 	bsf INTCON,GIE ; Enable all interrupts
 	bsf INTCON,PEIE 
 	call	startgame
 	call	loop_end
 	call	print
-check	movlw	0xff
-	CPFSEQ	PORTE
-;	movlw	0xEB
-;	CPFSEQ	tempo
+check	call	keyboard
+;	movlw	0xff
+;	CPFSEQ	PORTE
+	movlw	0xEB
+	CPFSEQ	tempo
 	bra	check	
 	call	LCD_Clear
 	movlw	.5
@@ -89,10 +85,16 @@ check	movlw	0xff
 	call	fair
 	movff	dig_1, pos4
 
-;	;stop interupt
-;	movlw	b'00000000'
-;	movwf	T0CON
+	;stop interupt
+	movlw	b'00000000'
+	movwf	T0CON
 	
+	movlw b'00000101' ; Set timer0 to 16-bit, Fosc/4/256
+	movwf T1CON 
+        movlw b'00000000' ; Set timer0 to 16-bit, Fosc/4/256
+	movwf T1GCON 
+
+	bsf PIE1, TMR1IE ; Enable timer1 interrupt
 	;intialise
 	movlw	0x05
 	movwf	game_counter
@@ -141,7 +143,7 @@ after_y	call	comparison
 	movf	temp_store,W
 	addwf	y_count,W
 	subwf	total_light, f
-	movf	total_light, W
+	movff	total_light, count_orange
 	movlw	0x01
 	addwf	total_light,f
 	call	add_z
@@ -150,7 +152,9 @@ after_y	call	comparison
 	movlw	0x04
 	CPFSGT	y_count	    ;lose condition
 	call	buzzer
+	lfsr	FSR2, myArray
 	movlw	0x04
+	movwf	temp_store  ;UART initialize
 	CPFSEQ	y_count	    ;win condition
 	call	UART_loop
 	CPFSEQ	y_count	    ;win condition
@@ -160,21 +164,6 @@ after_y	call	comparison
 	call	print
 	goto	retry
 
-UART_loop
-	movlw	.4	    ;UART initialize
-	movwf	temp_store
-	lfsr	FSR2, myArray
-	call	restart
-	decfsz	temp_store
-	goto	UART_loop	
-	return
-restart	
-	movf    POSTINC2, W
-	movff	PLUSW1, storage
-	movf	storage, W
-	call    UART_Transmit_Byte
-	return	
-	
 back_game
 	call	LCD_Clear
 	movlw	.5	    ;Need some time before it clear
@@ -194,7 +183,8 @@ show	call	print_answer
 	goto	show
 	goto	retry
 
-retry	movlw	0x7E	;loop the game again
+retry	;call	keyboard
+	movlw	0x7E	;loop the game again
 	CPFSEQ	tempo
 	goto	retry
 	call	LCD_Clear
