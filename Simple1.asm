@@ -161,6 +161,7 @@ retry	movlw	0x7E	;loop the game again
 	clrf	PORTH 
 	goto	start	
 
+;debug purpose
 write_ans
 	movf	POSTINC2, W				;use the pressed button to obtain the data from bank6
 	call	write
