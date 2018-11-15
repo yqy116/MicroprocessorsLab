@@ -11,7 +11,6 @@ pos_counter	res 1
 acs_ovr	access_ovr
 	
 	
-	
 initial;All kind of initialization
 	movlw	0x00
 	movwf	temp_res
