@@ -1,5 +1,5 @@
 #include p18f87k22.inc
-	global	interrupt_setup
+	global	interrupt_setup, interrupt_1
 	extern	int_ct,keyboard
 	
 int_hi	code 0x0008 ; high vector, no low vector
@@ -28,6 +28,7 @@ interrupt_setup
 	bsf INTCON,GIE ; Enable all interrupts
 	bsf INTCON,PEIE 
 	return
+	
 interrupt_1
 	;stop interupt
 	movlw	b'00000000'
