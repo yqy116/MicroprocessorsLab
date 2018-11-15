@@ -15,8 +15,19 @@
       <itemPath>Simple1.asm</itemPath>
       <itemPath>config.asm</itemPath>
       <itemPath>UART.asm</itemPath>
-      <itemPath>LCD.asm</itemPath>
       <itemPath>ADC.asm</itemPath>
+      <itemPath>History_Result.asm</itemPath>
+      <itemPath>Look_up_write.asm</itemPath>
+      <itemPath>count_colour.asm</itemPath>
+      <itemPath>count_run.asm</itemPath>
+      <itemPath>end_start.asm</itemPath>
+      <itemPath>game_logic.asm</itemPath>
+      <itemPath>keyboard.asm</itemPath>
+      <itemPath>keyin_values.asm</itemPath>
+      <itemPath>random_generate.asm</itemPath>
+      <itemPath>LCD.asm</itemPath>
+      <itemPath>Interrupt.asm</itemPath>
+      <itemPath>Light_calculation.asm</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -25,6 +36,10 @@
     </logicalFolder>
     <itemPath>README.md</itemPath>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>.</Elem>
+    <Elem>//icnas3.cc.ic.ac.uk/yqy116/Microprocessor/MicroprocessorsLab</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -72,7 +87,8 @@
         <property key="ToolFirmwareFilePath"
                   value="Press to browse for a specific firmware version"/>
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
-        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="debugoptions.useswbreakpoints" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>
