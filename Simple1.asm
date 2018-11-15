@@ -104,14 +104,29 @@ trial_loop
 	call	write_ans
 	decfsz	read_count
 	goto	trial_loop
-	
-	lfsr    FSR2, myinitial
 	call	count
-
+	
 ;key in guess
 answering
 	call	keyin
-	
+	lfsr    FSR0, myArray 
+	movf	POSTINC0,W
+	movff	PLUSW1, storage
+	movf	storage, W
+	call	LCD_Send_Byte_D	
+	movf	POSTINC0,W
+	movff	PLUSW1, storage
+	movf	storage, W
+	call	LCD_Send_Byte_D	
+	movf	POSTINC0,W
+	movff	PLUSW1, storage
+	movf	storage, W
+	call	LCD_Send_Byte_D	
+	movf	POSTINC0,W
+	movff	PLUSW1, storage
+	movf	storage, W
+	call	LCD_Send_Byte_D	
+	goto	$
 initial	;All kind of initialization
 	movlw	0x00
 	movwf	temp_res
