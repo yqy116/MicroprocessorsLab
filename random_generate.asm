@@ -1,8 +1,6 @@
 #include p18f87k22.inc
-	global	fair,read
-	global	dig_1
-	extern	int_ct, LCD_delay_ms
-
+	global	read, generate
+	extern	int_ct, LCD_delay_ms,myinitial
 
 acs0	    udata_acs
 read_pos    res 1
@@ -28,5 +26,17 @@ fair	call	read
 read	movff	int_ct, read_pos
 	call	LCD_delay_ms
 	return
-	
-end
+
+generate	
+	lfsr    FSR2, myinitial
+	call	fair
+	movff	dig_1, POSTINC2
+	call	fair
+	movff	dig_1, POSTINC2
+	call	fair
+	movff	dig_1, POSTINC2
+	call	fair
+	movff	dig_1, POSTINC2
+	return
+
+	end
