@@ -21,24 +21,21 @@ colour_count_seq
 	movlw	0x00
 	CPFSEQ	temp_store
 	goto	second_count_seq
-	movlw	0x01
-	addwf	R_count_seq, f
+	incf	R_count_seq, f
 	return
 	
 second_count_seq	
 	movlw	0x01
 	CPFSEQ	temp_store
 	goto	third_count_seq
-	movlw	0x01
-	addwf	G_count_seq, f
+	incf	G_count_seq, f
 	return
 	
 third_count_seq	
 	movlw	0x02
 	CPFSEQ	temp_store
 	goto	fourth_count_seq
-	movlw	0x01
-	addwf	B_count_seq, f
+	incf	B_count_seq, f
 	return	
 
 fourth_count_seq	
@@ -53,32 +50,28 @@ colour_count
 	movlw	0x77
 	CPFSEQ	temp_store
 	goto	second_count
-	movlw	0x01
-	addwf	R_count, f
+	incf	R_count, f
 	return
 	
 second_count	
 	movlw	0xB7
 	CPFSEQ	temp_store
 	goto	third_count
-	movlw	0x01
-	addwf	G_count, f
+	incf	G_count, f
 	return
 	
 third_count	
 	movlw	0xD7
 	CPFSEQ	temp_store
 	goto	fourth_count
-	movlw	0x01
-	addwf	B_count, f
+	incf	B_count, f
 	return	
 
 fourth_count	
 	movlw	0xE7
 	CPFSEQ	temp_store
 	return
-	movlw	0x01
-	addwf	Y_count, f
+	incf	Y_count, f
 	return	
 	
 comparison
