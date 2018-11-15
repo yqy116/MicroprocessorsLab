@@ -59,6 +59,8 @@ secondline
 LCD_Clear
 	movlw	b'00000001'	; display clear
 	call	LCD_Send_Byte_I
+	movlw	.5	    ;Need some time before it clear
+	call	LCD_delay_ms
 	return
 	
 LCD_Write_Hex	    ; Writes byte stored in W as hex
