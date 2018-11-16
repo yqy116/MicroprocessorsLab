@@ -12,10 +12,11 @@
 	extern	after_y
 	extern	end_game_logic
 	global	myArray, myinitial
+	extern	UART_Transmit_Byte
+	extern	game_counter
 	
 	
 acs0    udata_acs   ; named variables in access ram
-
 myArray res 4 ;save answer
 myinitial res 4;save initial values
 read_count  res	1
@@ -28,14 +29,16 @@ main	code
 start	call	game_startup
 	call	interrupt_setup
 	call	startgame
-
+	
 enter	call	keyboard
 ;	movlw	0xff
 ;	CPFSEQ	PORTE
 	movlw	0xEB
 	CPFSEQ	tempo
 	bra	enter	
-
+	;call	checker
+	;movf	game_counter,W
+	;goto	$
 Initialise_sequence
 	call	LCD_Clear
 	;Start reading the values
@@ -71,7 +74,7 @@ answering
 	movff	PLUSW1, storage
 	movf	storage, W
 	call	LCD_Send_Byte_D	
-
+	
 calculate_validate
 	call	initial	;initialization to green(yes) calculation
 	call	after_y	;from yellow light to show result in port H
