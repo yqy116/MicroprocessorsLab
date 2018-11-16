@@ -12,13 +12,12 @@
 	extern	interrupt_setup, interrupt_1
 	extern	after_y
 	extern	end_game_logic
-	global	myArray, myinitial,game_counter
+	global	myArray, myinitial
 	
 acs0    udata_acs   ; named variables in access ram
 
 myArray res 4 ;save answer
 myinitial res 4;save initial values
-game_counter res 1  ;the loop of game
 read_count  res	1
 
  
@@ -26,12 +25,7 @@ rst	code 0x0000 ; reset vector
 	goto start
 	
 main	code
-start	call UART_Setup
-	call LCD_Setup
-	clrf TRISD ; Set PORTD as all outputs
-	clrf LATD ; Clear PORTD outputs
-	clrf LATE
-	clrf LATH
+start	call	game_startup
 	call	interrupt_setup
 	call	startgame
 
@@ -47,12 +41,6 @@ Initialise_sequence
 	;Start reading the values
 	call	generate    ;generate random number
 	call	interrupt_1 ;start interrupt_1,stop interrupt_0
-	;intialise
-	movlw	0x05
-	movwf	game_counter
-	call	lookup				;initialise the lookup table
-	movlb	0
-	
 	lfsr    FSR2, myinitial
 	movlw	0x04
 	movwf	read_count
