@@ -2,45 +2,45 @@
 	extern	colour_count, write, LCD_Clear, keyboard
 	extern	myArray,tempo, temp_store, R_count, G_count, Y_count, B_count
 	global	keyin, counter
-	
+;this contain the subroutine to write adn store the guess
 acs0	    udata_acs
-counter	    res 1 
+counter	    res 1   ;variable to count the number of guess keyed in
 acs_ovr	access_ovr
 	
 	
 	code
-keyin	call	LCD_Clear
-	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
-	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
-	bsf INTCON,TMR0IE ; Enable timer0 interrupt
-	bsf INTCON,GIE ; Enable all interrupts
-	lfsr FSR0, myArray 
-	movlw	0x04
+keyin	call	LCD_Clear   ;clear the lcd so that previous guess is cleared
+	lfsr FSR0, myArray ;point FSR0 to myarray which store the guess
+;	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256	;shoudnt be needed
+;	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
+;	bsf INTCON,TMR0IE ; Enable timer0 interrupt
+;	bsf INTCON,GIE ; Enable all interrupts
+	movlw	0x04	    ;four guesses
 	movwf	counter
-	movlw	0x00
+	movlw	0x00	    ;initialise the colour count
 	movwf	R_count
 	movwf	G_count
 	movwf	Y_count
 	movwf	B_count
 	
 loop	;call	keyboard
-	movlw	0xff
-	CPFSEQ	tempo
+	movlw	0xff	    ;ensure that when no key is pressed(ff) go back to loop
+	CPFSEQ	tempo	    ;check if key is pressed in keypad
 	goto	answ
 	goto	loop
 	
-answ	movlw	0xEE
-	CPFSEQ	tempo
+answ	movlw	0xEE	;If c is pressed, redo the myarray again
+	CPFSEQ	tempo	;check if e is pressed in keypad
 	goto	accept
 	goto	keyin
 
-accept	movf	tempo, W
-	movff	tempo, temp_store
-	movwf	POSTINC0
-	call	write
-	call	colour_count
+accept	movf	tempo, W    ;move the key pressed into W 
+	movff	tempo, temp_store ;this is needed to count the colour
+	movwf	POSTINC0    ;store the value to myarray
+	call	write	    ;write and translate the key press into colour code
+	call	colour_count	;count the number of each colour in the guess
 	
-back	decfsz  counter
+back	decfsz  counter	    ;decrease the count of guess until it reach 4
 	goto	loop
 	return
 	end
