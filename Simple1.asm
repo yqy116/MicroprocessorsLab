@@ -1,4 +1,5 @@
 #include p18f87k22.inc
+	extern	game_startup
 	extern	generate, read
 	extern	keyin
 	extern	count
@@ -13,6 +14,7 @@
 	extern	after_y
 	extern	end_game_logic
 	global	myArray, myinitial
+	
 	
 acs0    udata_acs   ; named variables in access ram
 
