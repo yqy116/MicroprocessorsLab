@@ -9,7 +9,7 @@ history	code
 UART_loop
 	call	restart
 	decfsz	temp_store
-	goto	UART_loop	
+	goto	UART_loop
 	call	result
 	return
 restart	
