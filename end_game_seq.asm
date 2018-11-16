@@ -6,14 +6,14 @@
 ending_the_game	code
 	
 end_game_logic	
-	movlw	0x04
+	movlw	0x03
 	CPFSGT	y_count	    ;lose condition
-	call	buzzer
+	call	buzzer  
 	lfsr	FSR2, myArray
 	movlw	0x04
 	movwf	temp_store  ;UART initialize
-	CPFSEQ	y_count	    ;win condition
 	call	UART_loop   ;if didn't win, save result and guess through uart
+	movlw	0x04
 	CPFSEQ	y_count	    ;win condition
 	goto	back_game
 	call	wingame
@@ -49,4 +49,4 @@ retry	call	keyin
 	goto	end_game_logic
 	
 	
-end
+	end
