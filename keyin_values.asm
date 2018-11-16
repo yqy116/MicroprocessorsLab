@@ -37,8 +37,8 @@ answ	movlw	0xEE	;If c is pressed, redo the myarray again
 accept	movf	tempo, W    ;move the key pressed into W 
 	movff	tempo, temp_store ;this is needed to count the colour
 	movwf	POSTINC0    ;store the value to myarray
-	call	write	    ;write and translate the key press into colour code
-	call	colour_count	;count the number of each colour in the guess
+	call	write	    ;write and translate the key press into colour code (look_up_write)
+	call	colour_count	;count the number of each colour in the guess (count_colour)
 	
 back	decfsz  counter	    ;decrease the count of guess until it reach 4
 	goto	loop
