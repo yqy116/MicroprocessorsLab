@@ -1,7 +1,7 @@
 #include p18f87k22.inc
 	extern	colour_count, write, LCD_Clear, keyboard
 	extern	myArray,tempo, temp_store, R_count, G_count, Y_count, B_count
-	global	keyin
+	global	keyin, counter
 	
 acs0	    udata_acs
 counter	    res 1 
