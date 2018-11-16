@@ -3,7 +3,8 @@
 	
 acs0	    udata_acs
 adder	res 1
-tempo	res 1	
+tempo	res 1
+delay_constant	res 1
 acs_ovr	access_ovr	
 	
 key	code	
@@ -12,7 +13,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	banksel PADCFG1				;enable pull-ups and all that for PORTE
 	bsf	PADCFG1,RJPU,BANKED
 	movlw	0xFF
-	movwf	0x01
+	movwf	delay_constant
 	;Start the row 
 	movlw	0x0F				;gets the row byte
 	movwf	TRISJ
@@ -33,7 +34,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	movwf	tempo
 	return
 
-delay	decfsz 0x01 ; decrement until zero
+delay	decfsz delay_constant ; decrement until zero
 	bra delay
 	return
-end
+	end
