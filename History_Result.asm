@@ -30,10 +30,12 @@ result	movlw	' '
 	movf	count_orange, W
 	addlw	0x30
 	call    UART_Transmit_Byte
-	movlw	'Y'
+	movlw	'A'
 	call    UART_Transmit_Byte
 	movlw	','
 	call    UART_Transmit_Byte
+	movlw	'\n'
+	call    UART_Transmit_Byte
 	return
 	
-end
+	end
