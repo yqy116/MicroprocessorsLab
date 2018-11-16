@@ -1,35 +1,41 @@
-;point	lfsr    FSR2, myinitial
-;	movlw	0x04
-;	movwf	temp_store
-;loop_test
-;	movlw	0xff
-;	CPFSEQ	tempo
-;	goto	answ_test
-;	goto	loop_test
-;	
-;answ_test
-;	movlw	0xEE
-;	CPFSEQ	tempo
-;	goto	loop_3rd
-;	goto	point
-;	
-;loop_3rd
-;	call	input_ans
-;	decfsz	temp_store
-;	goto	loop_test
-;	
-;	lfsr    FSR2, myinitial
-;	;will remove the write at end of game
-;	movlb	0				;select bank 0 so the access bank is used again
-;	movff	POSTINC2, pos1
-;	movff	POSTINC2, pos2
-;	movff	POSTINC2, pos3
-;	movff	POSTINC2, pos4
-;;	
-;
-;
-;input_ans
-;	movf	tempo, W
-;	movff	tempo, POSTINC2
-;	call	write
-;	return
+#include p18f87k22.inc
+	extern	counter, temp_store,tempo,myinitial
+	extern	keyboard, write, LCD_delay_ms
+	global	point
+	
+manual_input	code
+	
+point	movlw	.5
+	call	LCD_delay_ms
+;	movlw	0x77
+;	movwf	tempo
+	lfsr    FSR2, myinitial
+	movlw	0x04
+	movwf	counter
+loop_test
+	movlw	0xff
+	CPFSEQ	tempo
+	goto	E_test
+	goto	loop_test
+
+E_test
+	movlw	0xeb
+	CPFSEQ	tempo
+	goto	answ_test
+	goto	loop_test	
+	
+answ_test
+	movlw	0xEE
+	CPFSEQ	tempo
+	goto	loop_3rd
+	goto	point
+	
+loop_3rd
+	movf	tempo, W
+	movff	tempo, temp_store
+	movwf	POSTINC2
+	call	write
+	decfsz  counter
+	goto	loop_test
+	return
+	end
