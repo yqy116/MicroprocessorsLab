@@ -8,7 +8,7 @@ counter	    res 1
 acs_ovr	access_ovr
 	
 	
-code
+	code
 keyin	call	LCD_Clear
 	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256
 	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
@@ -43,4 +43,15 @@ accept	movf	tempo, W
 back	decfsz  counter
 	goto	loop
 	return
-end
+	end
+
+;checker	movlw	0x52
+;	CPFSEQ	tempo
+;	goto	loop
+;	movlw	0x47
+;	CPFSEQ	tempo
+;	movlw	0x42
+;	CPFSEQ	tempo
+;	movlw	0x59
+;	CPFSEQ	tempo
+	return
