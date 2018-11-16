@@ -17,7 +17,7 @@ keyin	call	LCD_Clear   ;clear the lcd so that previous guess is cleared
 ;	bsf INTCON,GIE ; Enable all interrupts
 	movlw	0x04	    ;four guesses
 	movwf	counter
-	movlw	0x00	    ;initialise the colour count
+	movlw	0x00	    ;initialise the colour count for subroutine colour_count below
 	movwf	R_count
 	movwf	G_count
 	movwf	Y_count
