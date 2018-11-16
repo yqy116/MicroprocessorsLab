@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 	global	end_game_logic
-	extern	buzzer,wingame,UART_loop,LCD_Clear,LCD_delay_ms,endgame,secondline,print_answer,keyin,initial,after_y
+	extern	buzzer,wingame,UART_loop,LCD_Clear,LCD_delay_ms,endgame,secondline,print_answer,keyin,initial,after_y,UART_Transmit_Byte
 	extern	y_count,myArray,temp_store,game_counter,myinitial,tempo
 
 ending_the_game	code
@@ -41,12 +41,13 @@ replay	movlw	0x7E	;loop the game again
 	goto	replay
 	call	LCD_Clear
 	clrf	PORTH 
+	movlw	'\n'
+	call    UART_Transmit_Byte
 	return	
 
 retry	call	keyin
 	call	initial
 	call	after_y
 	goto	end_game_logic
-	
 	
 	end
