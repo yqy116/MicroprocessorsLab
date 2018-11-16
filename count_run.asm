@@ -4,7 +4,7 @@
 	extern	temp_store, myinitial,R_count,G_count,Y_count,B_count
 	extern	colour_count
 
-
+;abandoned! merge with count_colour
 	code
 colour_ini  
 	movlw	0x00
