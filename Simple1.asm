@@ -14,6 +14,8 @@
 	global	myArray, myinitial
 	extern	UART_Transmit_Byte
 	extern	game_counter
+	extern	point
+	extern	tempo
 	
 	
 acs0    udata_acs   ; named variables in access ram
@@ -74,7 +76,7 @@ answering
 	movff	PLUSW1, storage
 	movf	storage, W
 	call	LCD_Send_Byte_D	
-	
+
 calculate_validate
 	call	initial	;initialization to green(yes) calculation
 	call	after_y	;from yellow light to show result in port H
