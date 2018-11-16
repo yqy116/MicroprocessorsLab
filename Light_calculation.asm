@@ -48,4 +48,4 @@ after_y	call	comparison
 	movff	temp_res, PORTH ;show result
 	return
 	
-end
+	end
