@@ -5,7 +5,7 @@
 
 	
 
-code
+	code
 colour_ini  
 	movlw	0x00
 	movwf	R_count_seq
@@ -27,4 +27,4 @@ count	lfsr    FSR2, myinitial
 	call	colour_count_seq
 	return
 	
-end
+	end
