@@ -7,9 +7,7 @@
 	extern	startgame
 	extern	tempo, keyboard
 	extern	storage,lookup, write
-	extern	LCD_Setup, LCD_Send_Byte_D, LCD_Clear
-	extern	UART_Setup, UART_Transmit_Message
-	extern	UART_loop
+	extern	LCD_Send_Byte_D, LCD_Clear
 	extern	interrupt_setup, interrupt_1
 	extern	after_y
 	extern	end_game_logic
