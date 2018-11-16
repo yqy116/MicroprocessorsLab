@@ -3,15 +3,15 @@
 	global	R_count,G_count,Y_count,B_count,R_count_seq,G_count_seq,Y_count_seq,B_count_seq,temp_store,myinitial
 	
 acs0	    udata_acs
-R_count	res 1
-G_count	res 1    
-Y_count res 1
-B_count res 1
-B_count_seq res 1
-R_count_seq res 1
-Y_count_seq res 1
-G_count_seq res 1
-temp_store  res 1
+R_count	res 1	;number of red in guess
+G_count	res 1   ;number of green in guess
+Y_count res 1	;number of yellow in guess
+B_count res 1	;number of blue in guess
+B_count_seq res 1   ;number of blue in answer
+R_count_seq res 1   ;number of red in answer
+Y_count_seq res 1   ;number of yellow in answer
+G_count_seq res 1   ;number of green in answer
+temp_store  res 1   ;to temporary store a single answer/guess
 acs_ovr	access_ovr	
 	
 match_colour code	;contain the subroutine to count the number of every colour in guess and answer
