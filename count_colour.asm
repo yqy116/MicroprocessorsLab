@@ -78,7 +78,7 @@ fourth_count
 	return	
 	
 	
-;compare the number of colours in answer with the guess	
+;compare the number of colours in answer with the guess, to the number of incorrect colour+position
 comparison
 	movlw	0x00	
 	movwf	temp_store  ;temp_store will contain the number of incorrect colour+position
