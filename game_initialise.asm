@@ -2,7 +2,7 @@
     global  game_startup,game_counter
     extern  UART_Setup,LCD_Setup,lookup
     extern  keyboard, tempo
-    
+;this code initialse the setup and game tries
 acs0	    udata_acs
 game_counter	res 1
 hold		res 1
@@ -19,8 +19,8 @@ game_startup
     clrf LATH
     ;intialise
     movlw   0x05
-    movwf   game_counter
-    call    lookup				;initialise the lookup table
+    movwf   game_counter    ;set game tries
+    call    lookup	    ;initialise the lookup table
     movlb   0
     return
    
