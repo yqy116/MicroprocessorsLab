@@ -5,46 +5,44 @@
 	extern	myinitial,myArray,temp_store
 	
 acs0	    udata_acs
-y_count		res 1	 
-temp_res	res 1
-total_light	res 1
-pos_counter	res 1
-count_orange	res 1
+y_count		res 1	;number of correct position+colour(green)
+temp_res	res 1	;the number of bits set for the LED
+total_light	res 1	;initally will be four but will be minus with the number of green+amber lgiht
+pos_counter	res 1	;to validate all four position in guess
+count_orange	res 1	;number of correct colour but wrong position(amber)
 acs_ovr	access_ovr
 	
 validate_1  code
 	
 initial;All kind of initialization
 	movlw	0x00
-	movwf	temp_res
+	movwf	temp_res  
 	movwf	y_count
-	lfsr    FSR0, myArray 
-	lfsr    FSR2, myinitial
+	lfsr    FSR0, myArray	;point to the guess
+	lfsr    FSR2, myinitial	;point to the answer
 	movlw	0x04
-	movwf	pos_counter ;number of loop
-	movwf	total_light
-	call	LCD_Clear
-	movlw	.5	    ;Need some time before it clear
-	call	LCD_delay_ms
+	movwf	pos_counter ;number of loop, four position to loop through
+	movwf	total_light ;set the total number of light
+	call	LCD_Clear   ;to clear the guess value that was sent before(LCD)
 
 testtest	
-	call	validate
-	decfsz  pos_counter 
+	call	validate    ;to calculate the number of correct positon+colour (game logic)
+	decfsz  pos_counter ;loop four times
 	goto	testtest
 	return
 	
 
 ;second part of validate
   
-after_y	call	comparison
-	movf	temp_store,W ;temp_store contain number of the yellow light
-	addwf	y_count,W
-	subwf	total_light, f
-	movff	total_light, count_orange
-	incf	total_light
+after_y	call	comparison  ;to calculate the number of wrong position+colour
+	movf	temp_store,W ;temp_store contain number of the yellow light 
+	addwf	y_count,W   ;add with number of yellow light
+	subwf	total_light, f	;total_light left the the number of correct colour but wrong position
+	movff	total_light, count_orange   
+	incf	total_light ;increase by one as add_z routine start with decfsz, willc ause underflow if didn't plus 1
 	call	add_z
-	clrf	TRISH	
-	movf	temp_res, W
+	clrf	TRISH	    ;set port H as output althought set before but just in case
+	movf	temp_res, W ;debug purpose not needed actually
 	movff	temp_res, PORTH ;show result
 	return
 	
