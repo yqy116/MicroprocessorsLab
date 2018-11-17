@@ -1,23 +1,26 @@
 #include p18f87k22.inc
 	global	interrupt_setup, interrupt_1,stop_timer_2,int_ct
 	extern	keyboard
-;this contain all the subroutine for the on and off of interrupt and the interrupt routine
+	
+;this contains all the subroutine for turning the interrupt on and off and the interrupt routine. The timer0
+; interrupt is related to the random number generator and the timer1 interrupt is related to the keypad.
+
 acs0	    udata_acs
-int_ct	res 1	;variable to generate a pseudo random number
+int_ct	res 1	;variable to generate a pseudo random number, this variable will be internally incremented
 acs_ovr	access_ovr	
 	
 int_hi	code 0x0008 ; high vector, no low vector
 	btfss INTCON,TMR0IF ; check that this is timer0 interrupt
-	goto	 second	;go to the second timer
+	goto	 second	;go to the second timer, timer1
 	movlw	.1  ;offset the frequency of timer 0
 	movwf	TMR0L	
-	incf	int_ct	;to create a pseudo random number
+	incf	int_ct	;to create a pseudo random number which is internally incremented 
 	bcf INTCON,TMR0IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt
 
 second	btfss PIR1,TMR1IF
 	retfie FAST
-	call	keyboard    ;allow the key apd to work
+	call	keyboard    ;allow the keypad to work
 	bcf PIR1,TMR1IF ; clear interrupt flag
 	retfie FAST ; fast return from interrupt	
 	
