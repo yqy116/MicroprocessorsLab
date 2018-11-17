@@ -11,13 +11,14 @@ acs_ovr	access_ovr
 initialise_game code
  
 game_startup
-    call UART_Setup
-    call LCD_Setup
+    call UART_Setup ; function provided in microprocessors lab
+    call LCD_Setup  ; function provided in microprocessors lab
     clrf TRISD ; Set PORTD as all outputs
     clrf LATD ; Clear PORTD outputs
-    clrf LATE
-    clrf LATH
-    ;intialise
+    clrf LATE ; Clear PORTE outputs
+    clrf LATH ; Clear PORTH outputs
+    
+    ;intialise the game parameters
     movlw   0x05
     movwf   game_counter    ;set game tries
     call    lookup	    ;initialise the lookup table
