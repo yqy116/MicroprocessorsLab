@@ -34,10 +34,10 @@ testtest
 
 ;second part of validate
   
-after_y	call	comparison  ;to calculate the number of wrong position+colour
-	movf	temp_store,W ;temp_store contain number of the yellow light 
-	addwf	y_count,W   ;add with number of yellow light
-	subwf	total_light, f	;total_light left the the number of correct colour but wrong position
+after_y	call	comparison  ;to calculate the number of wrong position + wrongcolour
+	movf	temp_store,W ;temp_store contains the number of wrong guesses 
+	addwf	y_count,W   ; add the number of correct guesses with the number of wrong guesses
+	subwf	total_light, f	;total_light is the total number of guesses minus the correct&wrong guesses, it is right col + wrong pos
 	movff	total_light, count_orange   
 	incf	total_light ;increase by one as add_z routine start with decfsz, willc ause underflow if didn't plus 1
 	call	add_z
