@@ -41,7 +41,7 @@ enter_key
 ;	CPFSEQ	PORTE
 	movlw	0xEB	    ;only when you press E the code will procede
 	CPFSEQ	tempo	    ;tempo is the uncoded value of the paypad when it is pressed
-	bra	enter_key	    ;loop until E is pressed in keypad. The keypad value won't be obtained until E is pressed
+	bra	enter_key	;loop until E is pressed in keypad. The keypad value won't proceed until E is pressed
 	;call	checker
 	;movf	game_counter,W
 	;goto	$
