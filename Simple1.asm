@@ -23,7 +23,7 @@
 
 acs0    udata_acs   ; named variables in access ram
 myArray res 4 ;save answer
-myinitial res 4;save initial values for PVP mode
+myinitial res 4;save initial values 
 read_count  res	1
 
  
@@ -35,17 +35,17 @@ start	call	game_startup	;initialise setup and game tries (game_initialise)
 	call	interrupt_setup	;start timer 0 and enable all flag setup (interrupt)
 	call	startgame   ;send start game message to lcd (end_start)
 	
-enter	call	keyboard    ;to enable keypad
-;	movlw	0xff	    ;when want to avoid using keypad
+enter	call	keyboard    ;to enable keypad (keyboard)
+;	movlw	0xff	    ;when the keyboard isn't used, all bits are high.
 ;	CPFSEQ	PORTE
-	movlw	0xEB	    ;only when press E the code will procede
-	CPFSEQ	tempo	    ;tempo is the key(unstranslated) pressed
-	bra	enter	    ;loop until E is pressed in keypad
+	movlw	0xEB	    ;only when you press E the code will procede
+	CPFSEQ	tempo	    ;tempo is the uncoded value of the paypad when it is pressed
+	bra	enter	    ;loop until E is pressed in keypad. The keypad value won't be obtained until E is pressed
 	;call	checker
 	;movf	game_counter,W
 	;goto	$
 Initialise_sequence
-	call	LCD_Clear   ;clear the start message(lcd)
+	call	LCD_Clear   ;clear the start message (LCD)
 	;Start reading the values
 	call	generate    ;generate random number(random_generate)
 	call	interrupt_1 ;start interrupt_1,stop interrupt_0 (interrupt)
@@ -61,7 +61,7 @@ Initialise_sequence
 ;	
 ;key in guess
 answering
-	call	keyin		    ;call the routine to key in the guesses(
+	call	keyin		    ;call the routine to key in the guesses (keyin_values)
 ;	lfsr    FSR0, myArray	    ;for debugging purpose to see whether the guess was able to be called correctly
 ;	movf	POSTINC0,W
 ;	movff	PLUSW1, storage
