@@ -6,7 +6,7 @@ adder	res 1
 tempo	res 1
 delay_constant	res 1
 acs_ovr	access_ovr	
-	
+;this code conatin the subroutine for keyboard	
 key	code	
 	
 keyboard	;banksel cannot be same line with a label,etc.start
@@ -19,7 +19,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	movwf	TRISJ
 	call	delay
 	movwf	PORTJ
-	call	delay
+	call	delay				;underflow allows delay to happen again
 	movf	PORTJ, W, ACCESS
 	movwf   adder
 	;Start the column			;gets the column byte
