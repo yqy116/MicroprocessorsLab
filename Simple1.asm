@@ -20,7 +20,7 @@
 ;main file	
 acs0    udata_acs   ; named variables in access ram
 myArray res 4 ;save answer
-myinitial res 4;save initial values
+myinitial res 4;save initial values for PVP mode
 read_count  res	1
 
  
