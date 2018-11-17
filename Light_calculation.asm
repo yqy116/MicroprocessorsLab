@@ -41,7 +41,7 @@ after_y	call	comparison  ;to calculate the number of wrong position + wrong colo
 	movff	total_light, count_orange   
 	incf	total_light ; increase by one as add_z routine start with decfsz, will cause underflow if 1 isn't added
 	call	add_z       ; (game_logic)
-	clrf	TRISH	    ;set port H as output althought set before but just in case
+	clrf	TRISH	    ;set port H as output although set before but just in case
 	movf	temp_res, W ;debug purpose not needed actually
 	movff	temp_res, PORTH ;show result
 	return
