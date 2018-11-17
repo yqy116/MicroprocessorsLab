@@ -34,7 +34,7 @@ testtest
 
 ;second part of validate
   
-after_y	call	comparison  ;to calculate the number of wrong position + wrongcolour
+after_y	call	comparison  ;to calculate the number of wrong position + wrong colour
 	movf	temp_store,W ;temp_store contains the number of wrong guesses 
 	addwf	y_count,W   ; add the number of correct guesses with the number of wrong guesses
 	subwf	total_light, f	;total_light is the total number of guesses minus the correct&wrong guesses, it is right col + wrong pos
