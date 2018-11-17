@@ -14,11 +14,11 @@ fair	call	read	;move the int_ct into read_pos
 	movff	read_pos, dig_2	;move to the second bit of the random binary number
 	call	read
 	movff	read_pos, dig_1	;move to first bit
-	movlw	0x01	    ;mask and left with the 1st bit
+	movlw	0x01	    ;mask with 0x01 so you're left with the 1st bit
 	ANDWF	dig_2, f    
 	ANDWF	dig_1, f
 	RLNCF	dig_2, W    ;move the 2nd digit up by a bit
-;	movlw	0x02	    ;alternative emthod using multiply
+;	movlw	0x02	    ;alternative method using multiply
 ;	MULWF	dig_2, W
 ;	movf	PRODL, W
 	ADDWF	dig_1, f    ;add digit 1 with digit 2
