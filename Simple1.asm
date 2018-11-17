@@ -17,7 +17,10 @@
 	extern	point
 	extern	tempo
 	
-;main file	
+;main file, this contains the main script and the order in which the routines are called. Regarding comments,
+; if there is a bracket with writing inside, e.g (game_initialise), located at the end of the comment, this is
+; the file in which te called subroutine, variable or file is located.
+
 acs0    udata_acs   ; named variables in access ram
 myArray res 4 ;save answer
 myinitial res 4;save initial values for PVP mode
