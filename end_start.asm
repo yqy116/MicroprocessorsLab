@@ -8,7 +8,7 @@ word_count  res 1 ;number of words to be key in lcd
 mssg res 15	  ;store the message
 acs_ovr	access_ovr
 
-start_end_screen	code	;this contain all the subroutine to send end/start game messsage to LCD
+start_end_screen	code	;this contains all of the subroutine to send end/start game messsage to LCD
 	
 startTable data	    "Start:Press E"	; start message
 winTable data	    "You win!"	; win message
@@ -60,7 +60,7 @@ loop_end
 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
 	decfsz	temp_store	; count down to zero
-	bra	loop_end	; keep going until finished	
+	bra	loop_end	; keep going until all of the data is transferred	
 	lfsr	FSR2, mssg
 	goto	print	
 	
