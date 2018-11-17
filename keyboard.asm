@@ -21,7 +21,7 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	movwf	PORTJ
 	call	delay				;underflow allows delay to happen again
 	movf	PORTJ, W, ACCESS
-	movwf   adder
+	movwf   adder				; location to add the row data
 	;Start the column			;gets the column byte
 	call	delay
 	movlw	0xF0
@@ -29,8 +29,8 @@ keyboard	;banksel cannot be same line with a label,etc.start
 	call	delay
 	movwf	PORTJ
 	call	delay
-	movf	PORTJ, W, ACCESS		;combine the row and column binary stuff and output it to portD
-	iorwf	adder, W
+	movf	PORTJ, W, ACCESS		;move the column data to the W register
+	iorwf	adder, W			; combine the row and column data to get one value
 	movwf	tempo
 	return
 
