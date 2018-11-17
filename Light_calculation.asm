@@ -39,7 +39,7 @@ after_y	call	comparison  ;to calculate the number of wrong position + wrong colo
 	addwf	y_count,W   ; add the number of correct guesses with the number of wrong guesses
 	subwf	total_light, f	;total_light is the total number of guesses minus the correct&wrong guesses, it is right col + wrong pos
 	movff	total_light, count_orange   
-	incf	total_light ;increase by one as add_z routine start with decfsz, willc ause underflow if didn't plus 1
+	incf	total_light ; increase by one as add_z routine start with decfsz, will cause underflow if 1 isn't added
 	call	add_z
 	clrf	TRISH	    ;set port H as output althought set before but just in case
 	movf	temp_res, W ;debug purpose not needed actually
