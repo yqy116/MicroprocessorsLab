@@ -78,7 +78,15 @@ manual_initiate
 	goto	resume
 	
 resume	goto	answering
-	;call	interrupt_1 ;start interrupt_1,stop interrupt_0 (interrupt)
+	
+;revert back if doesnt work	
+;Initialise_sequence
+;	call	LCD_Clear   ;clear the start message (LCD)
+;	;Start reading the values
+;	call	generate    ;generate random number(random_generate)
+;	call	interrupt_1 ;start interrupt_1,stop interrupt_0 (interrupt)
+;	call	count
+	
 ;	lfsr    FSR2, myinitial	;this commented code is for debug purpose to see the answer
 ;	movlw	0x04
 ;	movwf	read_count
