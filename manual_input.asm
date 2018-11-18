@@ -5,7 +5,8 @@
 	
 manual_input	code
 	
-point	movlw	.5
+point	call	interrupt_1
+	movlw	.5
 	call	LCD_delay_ms
 ;	movlw	0x77
 ;	movwf	tempo
