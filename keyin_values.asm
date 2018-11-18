@@ -36,59 +36,59 @@ loop1	movlw	0xff	    ;ensure that when no key is pressed(ff) go back to loop
 	goto	loop2
 	bra	loop1
 	
-loop2	movlw	0x7B	    ;ensure that when no key is pressed(ff) go back to loop
-	CPFSEQ	tempo	    ;check if key is pressed in keypad
+loop2	movlw	0x7B	    ;ensure that when invalid key pressed(7B) go back to loop1 (no keys pressed)
+	CPFSEQ	tempo	    ;check if invalid key is pressed in keypad
 	goto	loop3
 	goto 	loop1
 	
-loop3	movlw	0xBB	    
+loop3	movlw	0xBB	  ;invalid key  
 	CPFSEQ	tempo	    
 	goto	loop4
 	goto	loop1
 	
-loop4	movlw	0xDB	    
+loop4	movlw	0xDB	   ;invalid key
 	CPFSEQ	tempo	    
 	goto	loop5
 	goto 	loop1
 	
-loop5	movlw	0x7D	    
+loop5	movlw	0x7D	    ;invalid key
 	CPFSEQ	tempo	    
 	goto	loop6
 	goto	loop1
 	
-loop6	movlw	0xBD	    
+loop6	movlw	0xBD	    ;invalid key
 	CPFSEQ	tempo	    
 	goto	loop7
 	goto	loop1
 	
-loop7	movlw	0xDD	    
+loop7	movlw	0xDD	    ;invalid key
 	CPFSEQ	tempo	    
 	goto	loop8
 	goto	loop1
 
-loop8	movlw	0xED	    
+loop8	movlw	0xED	    ;invalid key
 	CPFSEQ	tempo	    
 	goto	loop9
 	goto	loop1
 	
-loop9	movlw	0xEB	    
+loop9	movlw	0xEB	   ;invalid key 
 	CPFSEQ	tempo	    
 	goto	loopA
 	goto	loop1
 	
-loopA	movlw	0x7E	    
+loopA	movlw	0x7E	    ;invalid key
 	CPFSEQ	tempo	    
 	goto	loopB
 	goto	loop1
 	
-loopB	movlw	0xBE	    
+loopB	movlw	0xBE	    ;invalid key
 	CPFSEQ	tempo	    
 	goto	loopC
 	goto	loop1
 
-loopC	movlw	0xDE
+loopC	movlw	0xDE		;invalid key
 	CPFSEQ	tempo
-	goto 	answ
+	goto 	answ		;all invalid keys have now been checked, if no invalid keys have been pressed, can now proceed to answ
 	goto	loop1
 
 ;end of changes;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
