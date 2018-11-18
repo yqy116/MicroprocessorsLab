@@ -4,7 +4,7 @@
 	extern	keyin
 	extern	count
 	extern	initial
-	extern	startgame
+	extern	startgame,choice1,choice2
 	extern	tempo, keyboard
 	extern	storage,lookup, write
 	extern	LCD_Send_Byte_D, LCD_Clear
@@ -16,6 +16,7 @@
 	extern	game_counter
 	extern	point
 	extern	tempo
+	extern	secondline
 	
 ;main file, this contains the main script and the order in which the routines are called. Regarding comments,
 ; if there is a bracket with writing inside, e.g (game_initialise), located at the end of the comment, this is
@@ -47,9 +48,33 @@ enter_key
 	;goto	$
 Initialise_sequence
 	call	LCD_Clear   ;clear the start message (LCD)
+	call	choice1
+	call	secondline
+	call	choice2
+	movlw	0x78
+	CPFSEQ	tempo
+	goto	manual_route	
+	goto	random_route
+	
+random_route
+	call	LCD_Clear   ;clear the start message (LCD)
 	;Start reading the values
 	call	generate    ;generate random number(random_generate)
-	call	interrupt_1 ;start interrupt_1,stop interrupt_0 (interrupt)
+	call	count
+	goto	resume
+	
+manual_route
+	movlw	0xBB
+	CPFSEQ	tempo
+	goto	Initialise_sequence
+	goto	manual_initiate
+manual_initiate
+	call	LCD_Clear   ;clear the start message (LCD)
+	call	point
+	call	count_manual
+	goto	resume
+	
+resume	call	interrupt_1 ;start interrupt_1,stop interrupt_0 (interrupt)
 ;	lfsr    FSR2, myinitial	;this commented code is for debug purpose to see the answer
 ;	movlw	0x04
 ;	movwf	read_count
@@ -58,8 +83,7 @@ Initialise_sequence
 ;	call	write_ans
 ;	decfsz	read_count
 ;	goto	trial_loop
-;	call	count
-;	
+
 ;key in guess
 answering
 	call	keyin		    ;call the routine to key in the guesses (keyin_values)
