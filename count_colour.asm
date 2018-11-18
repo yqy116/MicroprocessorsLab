@@ -115,10 +115,10 @@ colour_ini	;initialise each number of colour to zero
 	movwf	G_count_seq
 	movwf	Y_count_seq
 	movwf	B_count_seq
-;	movwf	R_count
-;	movwf	G_count
-;	movwf	Y_count
-;	movwf	B_count
+	movwf	R_count
+	movwf	G_count
+	movwf	Y_count
+	movwf	B_count
 	return
 	
 count	lfsr    FSR2, myinitial	    ;point the fsr to the address of the answer
@@ -132,13 +132,24 @@ count	lfsr    FSR2, myinitial	    ;point the fsr to the address of the answer
 	movff	POSTINC2, temp_store
 	call	colour_count_seq
 	return
-	
-;	call	colour_count
-;	call	colour_count
-;	movff	R_count,R_count_seq
-;	movff	G_count,G_count_seq
-;	movff	Y_count,Y_count_seq
-;	movff	B_count,B_count_seq
+
+count_manual
+	lfsr    FSR2, myinitial	    ;point the fsr to the address of the answer
+	call	colour_ini	    ;intiate each number of colour to zero
+	movff	POSTINC2, temp_store	;first position
+	call	colour_count
+	movff	POSTINC2, temp_store	;second position and so on
+	call	colour_count
+	movff	POSTINC2, temp_store
+	call	colour_count
+	movff	POSTINC2, temp_store
+	call	colour_count
+	movff	R_count,R_count_seq
+	movff	G_count,G_count_seq
+	movff	Y_count,Y_count_seq
+	movff	B_count,B_count_seq
+	return
+
 
 ;trial
 ;	movlw	0xeb
