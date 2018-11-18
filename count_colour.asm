@@ -1,5 +1,5 @@
 #include p18f87k22.inc
-	global	colour_count_seq,colour_count, comparison,count
+	global	colour_count_seq,colour_count, comparison,count,count_manual
 	global	R_count,G_count,Y_count,B_count,R_count_seq,G_count_seq,Y_count_seq,B_count_seq,temp_store
 	extern	myinitial
 	
