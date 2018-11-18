@@ -16,7 +16,7 @@
 	extern	game_counter
 	extern	point
 	extern	tempo
-	extern	secondline
+	extern	secondline,count_manual
 	
 ;main file, this contains the main script and the order in which the routines are called. Regarding comments,
 ; if there is a bracket with writing inside, e.g (game_initialise), located at the end of the comment, this is
