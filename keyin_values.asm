@@ -51,6 +51,12 @@ loop3	movlw	0xD7
 	
 loop4	movlw	0xE7
 	CPFSEQ	tempo
+	goto	loop5
+	goto	answ
+	
+	
+loop5	movlw	0xEE
+	CPFSEQ	tempo
 	goto	loop1
 	goto	answ
 
