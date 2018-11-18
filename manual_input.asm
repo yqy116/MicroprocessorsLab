@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 	extern	counter, temp_store,tempo,myinitial
-	extern	keyboard, write, LCD_delay_ms
+	extern	interrupt_1, write, LCD_delay_ms
 	global	point
 	
 manual_input	code
