@@ -30,6 +30,32 @@ loop	;call keyboard
 	goto	answ
 	goto	loop
 	
+	
+;or maybe this one is better as it has less options?;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;this one only let's you proceed if you've pressed the correct button otherwise it keeps on looping
+
+loop1	movlw	0x77
+	CPFSEQ	tempo
+	goto	loop2
+	goto	answ
+	
+loop2	movlw	0xB7
+	CPFSEQ	tempo
+	goto	loop3
+	goto	answ
+
+loop3	movlw	0xD7
+	CPFSEQ	tempo
+	goto	loop4
+	goto	answ
+	
+loop4	movlw	0xE7
+	CPFSEQ	tempo
+	goto	loop1
+	goto	answ
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
 ;hi you can comment all of this out if it doesn't work;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 loop1	movlw	0xff	    ;ensure that when no key is pressed(ff) go back to loop
 	CPFSEQ	tempo	    ;check if key is pressed in keypad
