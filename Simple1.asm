@@ -50,6 +50,7 @@ Initialise_sequence
 	;Start reading the values
 	call	generate    ;generate random number(random_generate)
 	call	interrupt_1 ;start interrupt_1,stop interrupt_0 (interrupt)
+	call	count
 ;	lfsr    FSR2, myinitial	;this commented code is for debug purpose to see the answer
 ;	movlw	0x04
 ;	movwf	read_count
@@ -58,7 +59,7 @@ Initialise_sequence
 ;	call	write_ans
 ;	decfsz	read_count
 ;	goto	trial_loop
-;	call	count
+;	
 ;	
 ;key in guess
 answering
