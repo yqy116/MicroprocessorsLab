@@ -23,11 +23,77 @@ keyin	call	LCD_Clear   ;clear the lcd so that previous guess is cleared
 	movwf	Y_count
 	movwf	B_count
 	
-loop	;call	keyboard
-	movlw	0xff	    ;ensure that when no key is pressed(ff) go back to loop
-	CPFSEQ	tempo	    ;check if key is pressed in keypad
+	
+loop	;call keyboard	
+	movlw	0xFF
+	CPFSEQ	tempo
 	goto	answ
 	goto	loop
+	
+;hi you can comment all of this out if it doesn't work;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+loop1	movlw	0xff	    ;ensure that when no key is pressed(ff) go back to loop
+	CPFSEQ	tempo	    ;check if key is pressed in keypad
+	goto	loop2
+	bra	loop1
+	
+loop2	movlw	0x7B	    ;ensure that when no key is pressed(ff) go back to loop
+	CPFSEQ	tempo	    ;check if key is pressed in keypad
+	goto	loop3
+	goto 	loop1
+	
+loop3	movlw	0xBB	    
+	CPFSEQ	tempo	    
+	goto	loop4
+	goto	loop1
+	
+loop4	movlw	0xDB	    
+	CPFSEQ	tempo	    
+	goto	loop5
+	goto 	loop1
+	
+loop5	movlw	0x7D	    
+	CPFSEQ	tempo	    
+	goto	loop6
+	goto	loop1
+	
+loop6	movlw	0xBD	    
+	CPFSEQ	tempo	    
+	goto	loop7
+	goto	loop1
+	
+loop7	movlw	0xDD	    
+	CPFSEQ	tempo	    
+	goto	loop8
+	goto	loop1
+
+loop8	movlw	0xED	    
+	CPFSEQ	tempo	    
+	goto	loop9
+	goto	loop1
+	
+loop9	movlw	0xEB	    
+	CPFSEQ	tempo	    
+	goto	loopA
+	goto	loop1
+	
+loopA	movlw	0x7E	    
+	CPFSEQ	tempo	    
+	goto	loopB
+	goto	loop1
+	
+loopB	movlw	0xBE	    
+	CPFSEQ	tempo	    
+	goto	loopC
+	goto	loop1
+
+loopC	movlw	0xDE
+	CPFSEQ	tempo
+	goto 	answ
+	goto	loop1
+
+;end of changes;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+	
 	
 answ	movlw	0xEE	;If c is pressed, redo the myarray again
 	CPFSEQ	tempo	;check if e is pressed in keypad
