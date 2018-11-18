@@ -51,6 +51,8 @@ Initialise_sequence
 	call	choice1
 	call	secondline
 	call	choice2
+invalid
+	call	keyboard
 	movlw	0x78
 	CPFSEQ	tempo
 	goto	manual_route	
@@ -61,12 +63,13 @@ random_route
 	;Start reading the values
 	call	generate    ;generate random number(random_generate)
 	call	count
+	call	interrupt_1 
 	goto	resume
 	
 manual_route
 	movlw	0xBB
 	CPFSEQ	tempo
-	goto	Initialise_sequence
+	goto	invalid
 	goto	manual_initiate
 manual_initiate
 	call	LCD_Clear   ;clear the start message (LCD)
@@ -74,7 +77,8 @@ manual_initiate
 	call	count_manual
 	goto	resume
 	
-resume	call	interrupt_1 ;start interrupt_1,stop interrupt_0 (interrupt)
+resume	goto	answering
+	;call	interrupt_1 ;start interrupt_1,stop interrupt_0 (interrupt)
 ;	lfsr    FSR2, myinitial	;this commented code is for debug purpose to see the answer
 ;	movlw	0x04
 ;	movwf	read_count
