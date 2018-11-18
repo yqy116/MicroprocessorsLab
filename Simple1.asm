@@ -46,6 +46,7 @@ enter_key
 	;call	checker
 	;movf	game_counter,W
 	;goto	$
+	
 ;uncomment to test manual input
 ;Initialise_sequence
 ;	call	LCD_Clear   ;clear the start message (LCD)
