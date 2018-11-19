@@ -6,19 +6,9 @@
 manual_input	code
 	
 point	call	interrupt_1
-	movlw	.5
-	call	LCD_delay_ms
-;	movlw	0x77
-;	movwf	tempo
 	lfsr    FSR2, myinitial
 	movlw	0x04
 	movwf	counter
-;loop_test
-;	movlw	0xff
-;	CPFSEQ	tempo
-;	goto	E_test
-;	goto	loop_test
-
 loop1_manual
 	movlw	0x77
 	CPFSEQ	tempo
