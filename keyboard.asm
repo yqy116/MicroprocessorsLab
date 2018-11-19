@@ -2,9 +2,9 @@
 	global	tempo, keyboard
 	
 acs0	    udata_acs
-adder	res 1
-tempo	res 1
-delay_constant	res 1
+adder	res 1	;location to add the row data
+tempo	res 1	;the value pressed by the keyboard
+delay_constant	res 1	;the varaible for length of delay
 acs_ovr	access_ovr	
 ;this code conatin the subroutine for keyboard	
 key	code	
