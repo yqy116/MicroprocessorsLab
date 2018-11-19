@@ -6,7 +6,7 @@
 	
 ;this contain the subroutine to choose the game mode
 	 
-	 code
+mode	 code
 	 
 Game_choice
 	call	LCD_Clear   ;clear the start message (LCD)
