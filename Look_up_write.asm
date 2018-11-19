@@ -57,8 +57,7 @@ lookup
 
 	
 write	
-	movff	PLUSW1, storage	    ;translate the random number/keypad to colour
-	movf	storage, W
+	movf	PLUSW1, W	    ;translate the random number/keypad to colour
 	call	LCD_Send_Byte_D	    ;once it's all retrieved, write it to the LCD
 	call	LCD_delay_ms
 	call	LCD_delay_ms
