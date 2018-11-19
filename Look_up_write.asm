@@ -3,7 +3,7 @@
 	global	storage,lookup, write
 ;this code contain the lookup table and the translation to the colour code
 acs0	    udata_acs
-storage	    res 1 
+storage	    res 1   ;temporary store the colour
 acs_ovr	access_ovr
 
 match	code	
