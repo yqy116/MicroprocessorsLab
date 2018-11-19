@@ -70,7 +70,7 @@ random_route
 	call	generate    ;generate random number(random_generate)
 	call	count	    ;count the number of each colour in the answ
 	call	interrupt_1 ;allow the keyboard to work and stop the random generator
-	goto	resume
+	goto	answering
 	
 manual_route
 	movlw	0x7D
@@ -81,18 +81,8 @@ manual_initiate
 	call	LCD_Clear   ;clear the start message (LCD)
 	call	point	    ;allow user to manually input the answ
 	call	count_manual	;count the number of each colour in the answ
-	goto	resume
-	
-resume	goto	answering
-	
-;revert back if doesnt work	
-;Initialise_sequence
-;	call	LCD_Clear   ;clear the start message (LCD)
-;	;Start reading the values
-;	call	generate    ;generate random number(random_generate)
-;	call	interrupt_1 ;start interrupt_1,stop interrupt_0 (interrupt)
-;	call	count
-	
+	goto	answering
+
 ;	lfsr    FSR2, myinitial	;this commented code is for debug purpose to see the answer
 ;	movlw	0x04
 ;	movwf	read_count
