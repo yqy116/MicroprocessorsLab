@@ -1,22 +1,22 @@
 #include p18f87k22.inc
-	extern	game_startup
+	extern	game_startup,loop1_gametry
 	extern	generate, read
 	extern	keyin
 	extern	count
 	extern	initial
-	extern	startgame,choice1,choice2
+	extern	startgame,choice1,choice2,trials
 	extern	tempo, keyboard
 	extern	storage,lookup, write
 	extern	LCD_Send_Byte_D, LCD_Clear
 	extern	interrupt_setup, interrupt_1
 	extern	after_y
 	extern	end_game_logic
-	global	myArray, myinitial
+	global	myArray, myinitial,start
 	extern	UART_Transmit_Byte
 	extern	game_counter
 	extern	point
 	extern	tempo
-	extern	secondline,count_manual, LCD_delay_ms
+	extern	secondline,count_manual
 	
 ;main file, this contains the main script and the order in which the routines are called. Regarding comments,
 ; if there is a bracket with writing inside, e.g (game_initialise), located at the end of the comment, this is
@@ -46,37 +46,41 @@ enter_key
 	;call	checker
 	;movf	game_counter,W
 	;goto	$
+choose_tries
+	call	LCD_Clear
+	call	trials
+	call	loop1_gametry
 	
 ;uncomment to test manual input
 Initialise_sequence
 	call	LCD_Clear   ;clear the start message (LCD)
-	call	choice1
-	call	secondline
-	call	choice2
+	call	choice1	    ;print the game mode in LCD
+	call	secondline  ;jump to the second line of LCD
+	call	choice2	    ;print the game mode in LCD
 invalid
-	call	keyboard
-	movlw	0x7B
+	call	keyboard    ;enable keypad to choose the mode
+	movlw	0x7B	    ;press 4 for random mode
 	CPFSEQ	tempo
-	goto	manual_route	
-	goto	random_route
+	goto	manual_route	;manual input mode
+	goto	random_route	;random mode
 	
 random_route
 	call	LCD_Clear   ;clear the start message (LCD)
 	;Start reading the values
 	call	generate    ;generate random number(random_generate)
-	call	count
-	call	interrupt_1 
+	call	count	    ;count the number of each colour in the answ
+	call	interrupt_1 ;allow the keyboard to work and stop the random generator
 	goto	resume
 	
 manual_route
-	movlw	0xBB
+	movlw	0x7D
 	CPFSEQ	tempo
-	goto	invalid
+	goto	invalid	    ;if 4 or 5 not pressed go back and try again
 	goto	manual_initiate
 manual_initiate
 	call	LCD_Clear   ;clear the start message (LCD)
-	call	point
-	call	count_manual
+	call	point	    ;allow user to manually input the answ
+	call	count_manual	;count the number of each colour in the answ
 	goto	resume
 	
 resume	goto	answering
