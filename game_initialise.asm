@@ -1,5 +1,5 @@
 #include p18f87k22.inc
-    global  game_startup,game_counter,loop1_gametry
+    global  game_startup,game_counter,game_tries
     extern  UART_Setup,LCD_Setup,lookup
     extern  keyboard, tempo
 ;this code initialse the setup and game tries
@@ -25,18 +25,19 @@ game_startup
     movlb   0
     return
    
-loop1_gametry
-	call	keyboard
+game_tries
+	
+	call	keyboard    ;enable keyboard to be used
 	movlw	0x7E
 	CPFSEQ	tempo
-	goto	loop2_gametry
-	goto	game_counter_10
+	goto	loop2_gametry	;if key A is not pressed goto second check
+	goto	game_counter_10	;10 game tries is chosen
 	
 loop2_gametry
 	movlw	0xBB
 	CPFSEQ	tempo
-	goto	loop1_gametry
-	goto	game_counter_5
+	goto	game_tries	;if invalid key is pressed try again
+	goto	game_counter_5	;5 game tries is chosen
 	
 game_counter_5
     movlw   0x05
