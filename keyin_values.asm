@@ -1,5 +1,5 @@
 #include p18f87k22.inc
-	extern	colour_count, write, LCD_Clear, keyboard
+	extern	colour_count, write, LCD_Clear, keyboard, start
 	extern	myArray,tempo, temp_store, R_count, G_count, Y_count, B_count
 	global	keyin, counter
 ;this contain the subroutine to write adn store the guess
@@ -11,10 +11,6 @@ acs_ovr	access_ovr
 	code
 keyin	call	LCD_Clear   ;clear the lcd so that previous guess is cleared
 	lfsr FSR0, myArray ;point FSR0 to myarray which store the guess
-;	movlw b'10000000' ; Set timer0 to 16-bit, Fosc/4/256	;shoudnt be needed
-;	movwf T0CON ; = 62.5KHz clock rate, approx 1sec rollover
-;	bsf INTCON,TMR0IE ; Enable timer0 interrupt
-;	bsf INTCON,GIE ; Enable all interrupts
 	movlw	0x04	    ;four guesses
 	movwf	counter
 	movlw	0x00	    ;initialise the colour count for subroutine colour_count below
@@ -22,12 +18,6 @@ keyin	call	LCD_Clear   ;clear the lcd so that previous guess is cleared
 	movwf	G_count
 	movwf	Y_count
 	movwf	B_count
-	
-;loop	;call	keyboard
-;	movlw	0xff	    ;ensure that when no key is pressed(ff) go back to loop
-;	CPFSEQ	tempo	    ;check if key is pressed in keypad
-;	goto	answ
-;	goto	loop
 	
 loop1	movlw	0x77
 	CPFSEQ	tempo
@@ -52,14 +42,26 @@ loop4	movlw	0xE7
 	
 loop5	movlw	0xEE
 	CPFSEQ	tempo
-	goto	loop1
+	goto	loop6
 	goto	answ
 	
+loop6	movlw	0x7E
+	CPFSEQ	tempo
+	goto	loop1
+	goto	answ	
+
 answ	movlw	0xEE	;If c is pressed, redo the myarray again
 	CPFSEQ	tempo	;check if e is pressed in keypad
-	goto	accept
+	goto	restart_game
 	goto	keyin
-
+	
+restart_game
+	movlw	0x7E
+	CPFSEQ	tempo
+	goto	accept
+	POP
+	goto	start
+	
 accept	movf	tempo, W    ;move the key pressed into W 
 	movff	tempo, temp_store ;this is needed to count the colour
 	movwf	POSTINC0    ;store the value to myarray
@@ -71,13 +73,4 @@ back	decfsz  counter	    ;decrease the count of guess until it reach 4
 	return
 	end
 
-;checker	movlw	0x52
-;	CPFSEQ	tempo
-;	goto	loop
-;	movlw	0x47
-;	CPFSEQ	tempo
-;	movlw	0x42
-;	CPFSEQ	tempo
-;	movlw	0x59
-;	CPFSEQ	tempo
 	return
