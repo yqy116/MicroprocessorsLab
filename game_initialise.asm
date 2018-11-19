@@ -4,8 +4,7 @@
     extern  keyboard, tempo
 ;this code initialse the setup and game tries
 acs0	    udata_acs
-game_counter	res 1
-hold		res 1
+game_counter	res 1;number of game tries
 acs_ovr	access_ovr
 	
 initialise_game code
