@@ -137,32 +137,17 @@ count_manual
 	lfsr    FSR2, myinitial	    ;point the fsr to the address of the answer
 	call	colour_ini	    ;intiate each number of colour to zero
 	movff	POSTINC2, temp_store	;first position
-	call	colour_count
+	call	colour_count		;both use keypad to get the colour so can use the same subroutine to count
 	movff	POSTINC2, temp_store	;second position and so on
 	call	colour_count
 	movff	POSTINC2, temp_store
 	call	colour_count
 	movff	POSTINC2, temp_store
 	call	colour_count
-	movff	R_count,R_count_seq
+	movff	R_count,R_count_seq	;as R_count original is for the guesses, needed to move back to the variable for answer
 	movff	G_count,G_count_seq
 	movff	Y_count,Y_count_seq
 	movff	B_count,B_count_seq
 	return
 
-
-;trial
-;	movlw	0xeb
-;	CPFSEQ	tempo
-;	goto	skip
-;	goto	trial
-;skip	call	point
-;	lfsr    FSR2, myinitial
-;	movlw	0x04
-;	movwf	read_count
-;	;will remove the write at end of game
-;trial_loop	
-;	call	write_ans
-;	decfsz	read_count
-;	goto	trial_loop
 	end
