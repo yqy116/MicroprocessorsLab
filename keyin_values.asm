@@ -23,11 +23,37 @@ keyin	call	LCD_Clear   ;clear the lcd so that previous guess is cleared
 	movwf	Y_count
 	movwf	B_count
 	
-loop	;call	keyboard
-	movlw	0xff	    ;ensure that when no key is pressed(ff) go back to loop
-	CPFSEQ	tempo	    ;check if key is pressed in keypad
+;loop	;call	keyboard
+;	movlw	0xff	    ;ensure that when no key is pressed(ff) go back to loop
+;	CPFSEQ	tempo	    ;check if key is pressed in keypad
+;	goto	answ
+;	goto	loop
+	
+loop1	movlw	0x77
+	CPFSEQ	tempo
+	goto	loop2
 	goto	answ
-	goto	loop
+	
+loop2	movlw	0xB7
+	CPFSEQ	tempo
+	goto	loop3
+	goto	answ
+
+loop3	movlw	0xD7
+	CPFSEQ	tempo
+	goto	loop4
+	goto	answ
+	
+loop4	movlw	0xE7
+	CPFSEQ	tempo
+	goto	loop5
+	goto	answ
+	
+	
+loop5	movlw	0xEE
+	CPFSEQ	tempo
+	goto	loop1
+	goto	answ
 	
 answ	movlw	0xEE	;If c is pressed, redo the myarray again
 	CPFSEQ	tempo	;check if e is pressed in keypad
@@ -41,7 +67,7 @@ accept	movf	tempo, W    ;move the key pressed into W
 	call	colour_count	;count the number of each colour in the guess (count_colour)
 	
 back	decfsz  counter	    ;decrease the count of guess until it reach 4
-	goto	loop
+	goto	loop1
 	return
 	end
 
