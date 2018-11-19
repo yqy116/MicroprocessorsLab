@@ -1,11 +1,11 @@
 #include p18f87k22.inc
 	extern	LCD_Send_Byte_D, LCD_delay_ms, write
 	extern	temp_store
-	global	startgame, endgame, wingame, buzzer, print_answer,choice1,choice2
+	global	startgame, endgame, wingame, buzzer, print_answer,choice1,choice2,trials
 	    
 acs0	    udata_acs
 word_count  res 1 ;number of words to be key in lcd
-mssg res 15	  ;store the message
+mssg res 16	  ;store the message
 acs_ovr	access_ovr
 
 start_end_screen	code	;this contains all of the subroutine to send end/start game messsage to LCD
@@ -14,8 +14,8 @@ startTable data	    "Start:Press E"	; start message
 winTable data	    "You win!"	; win message
 myTable data	    "You lose!Ans is:"	;ending message
 choiceTable data    "Random colours:4"	;choice 1,generate random number
-choice2Table data    "Manual input:5"	;choice 2,manual input
- 
+choice2Table data    "Manual input:7"	;choice 2,manual input
+trialTable  data    "No.Trials:5 10" 
  
 choice1
  	lfsr	FSR0, mssg	; Load FSR0 with address in RAM	
@@ -27,7 +27,6 @@ choice1
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	.16		
 	movwf	temp_store	;store number of bytes of message into mssg
-	movlw	0x10
 	movwf	word_count	;number of words to be key in lcd
 	goto	loop_end
  
@@ -41,7 +40,6 @@ choice2
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	.14		
 	movwf	temp_store	;store number of bytes of message into mssg
-	movlw	0x0e
 	movwf	word_count	;number of words to be key in lcd
 	goto	loop_end
 	
@@ -55,7 +53,19 @@ startgame
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	.13		
 	movwf	temp_store	;store number of bytes of message into mssg
-	movlw	0x0d
+	movwf	word_count	;number of words to be key in lcd
+	goto	loop_end
+	
+trials
+	lfsr	FSR0, mssg	; Load FSR0 with address in RAM	
+	movlw	upper(trialTable)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(trialTable)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(trialTable)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	.14		
+	movwf	temp_store	;store number of bytes of message into mssg
 	movwf	word_count	;number of words to be key in lcd
 	goto	loop_end
  
@@ -69,7 +79,6 @@ endgame
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	.16
 	movwf	temp_store	;store number of bytes of message into mssg
-	movlw	0x10
 	movwf	word_count	;number of words to be key in lcd
 	goto	loop_end
 
@@ -83,7 +92,6 @@ wingame
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	.8
 	movwf	temp_store	;store number of bytes of message into mssg
-	movlw	0x08
 	movwf 	word_count	
 	goto	loop_end
 
