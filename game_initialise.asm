@@ -1,5 +1,5 @@
 #include p18f87k22.inc
-    global  game_startup,game_counter
+    global  game_startup,game_counter,loop1_gametry
     extern  UART_Setup,LCD_Setup,lookup
     extern  keyboard, tempo
 ;this code initialse the setup and game tries
@@ -25,68 +25,26 @@ game_startup
     movlb   0
     return
    
-    
-;checker
-;    call    keyboard
-;    movlw	0xFF
-;    CPFSLT	tempo
-;    bra	checker	
-;    movlw   0x00
-;    movwf   hold
-;    call keyboard
-;    movlw   0x7B
-;    cpfseq  tempo
-;    movlw   0xBB
-;    cpfseq  tempo
-;    movlw   0x00
-;    movf    tempo, W
-;    addwf   hold
-;    call    selecter
-;    return
-;    
-; selecter
-;    call keyboard
-;    movlw   0x7B
-;    cpfseq  hold
-;    call    game_counter_4
-;    cpfseq  hold
-;    return
-;    call    game_counter_5   
-;    return
-    
-    
-    
-;checker	
-;    call    keyboard
-;    movlw   0x7B
-;    CPFSEQ  tempo
-;    goto    checker
-;    call    
-;;    movlw   0xBB
-;;    CPFSEQ  tempo
-;;    goto    checker
-;    
-;key_in_game_counter   
-;    movlw   0x7B
-;    CPFSEQ  tempo
-;    call    game_counter_5
-;    CPFSEQ  tempo
-;    goto    key_in_game_counter
-;    movlw   0xBB
-;    CPFSEQ  tempo
-;    call    game_counter_4
-;    CPFSEQ  tempo
-;    goto    key_in_game_counter
-;    return
-;  
+loop1_gametry
+	call	keyboard
+	movlw	0x7E
+	CPFSEQ	tempo
+	goto	loop2_gametry
+	goto	game_counter_10
+	
+loop2_gametry
+	movlw	0xBB
+	CPFSEQ	tempo
+	goto	loop1_gametry
+	goto	game_counter_5
+	
 game_counter_5
     movlw   0x05
     movwf   game_counter
     return
     
-game_counter_4
-    movlw   0x04
+game_counter_10
+    movlw   0x0A
     movwf   game_counter
     return  
-    
     END
