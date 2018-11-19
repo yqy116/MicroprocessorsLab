@@ -1,22 +1,16 @@
 #include p18f87k22.inc
-	extern	game_startup,loop1_gametry
-	extern	generate, read
+	extern	game_startup,game_tries
 	extern	keyin
-	extern	count
 	extern	initial
-	extern	startgame,choice1,choice2,trials
+	extern	startgame,trials
 	extern	tempo, keyboard
 	extern	storage,lookup, write
-	extern	LCD_Send_Byte_D, LCD_Clear
-	extern	interrupt_setup, interrupt_1
+	extern	LCD_Clear
+	extern	interrupt_setup
 	extern	after_y
 	extern	end_game_logic
 	global	myArray, myinitial,start
-	extern	UART_Transmit_Byte
-	extern	game_counter
-	extern	point
-	extern	tempo
-	extern	secondline,count_manual
+	extern	Game_choice
 	
 ;main file, this contains the main script and the order in which the routines are called. Regarding comments,
 ; if there is a bracket with writing inside, e.g (game_initialise), located at the end of the comment, this is
@@ -43,45 +37,15 @@ enter_key
 	movlw	0xEB	    ;only when you press E the code will procede
 	CPFSEQ	tempo	    ;tempo is the uncoded value of the paypad when it is pressed
 	bra	enter_key	;loop until E is pressed in keypad. The keypad value won't proceed until E is pressed
-	;call	checker
-	;movf	game_counter,W
-	;goto	$
+	
 choose_tries
-	call	LCD_Clear
-	call	trials
-	call	loop1_gametry
+	call	LCD_Clear   ;clear the previous message
+	call	trials	    ;print game tries message to LCD(end_start)
+	call	game_tries  ;choose the game try
 	
 ;uncomment to test manual input
-Initialise_sequence
-	call	LCD_Clear   ;clear the start message (LCD)
-	call	choice1	    ;print the game mode in LCD
-	call	secondline  ;jump to the second line of LCD
-	call	choice2	    ;print the game mode in LCD
-invalid
-	call	keyboard    ;enable keypad to choose the mode
-	movlw	0x7B	    ;press 4 for random mode
-	CPFSEQ	tempo
-	goto	manual_route	;manual input mode
-	goto	random_route	;random mode
-	
-random_route
-	call	LCD_Clear   ;clear the start message (LCD)
-	;Start reading the values
-	call	generate    ;generate random number(random_generate)
-	call	count	    ;count the number of each colour in the answ
-	call	interrupt_1 ;allow the keyboard to work and stop the random generator
-	goto	answering
-	
-manual_route
-	movlw	0x7D
-	CPFSEQ	tempo
-	goto	invalid	    ;if 4 or 5 not pressed go back and try again
-	goto	manual_initiate
-manual_initiate
-	call	LCD_Clear   ;clear the start message (LCD)
-	call	point	    ;allow user to manually input the answ
-	call	count_manual	;count the number of each colour in the answ
-	goto	answering
+choose_mode
+	call	Game_choice ;choose game mode(game_mode)
 
 ;	lfsr    FSR2, myinitial	;this commented code is for debug purpose to see the answer
 ;	movlw	0x04
@@ -95,23 +59,6 @@ manual_initiate
 ;key in guess
 answering
 	call	keyin		    ;call the routine to key in the guesses (keyin_values)
-;	lfsr    FSR0, myArray	    ;for debugging purpose to see whether the guess was able to be called correctly
-;	movf	POSTINC0,W
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	call	LCD_Send_Byte_D	
-;	movf	POSTINC0,W
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	call	LCD_Send_Byte_D	
-;	movf	POSTINC0,W
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	call	LCD_Send_Byte_D	
-;	movf	POSTINC0,W
-;	movff	PLUSW1, storage
-;	movf	storage, W
-;	call	LCD_Send_Byte_D	
 
 calculate_validate ;compare the guess and answer and make an end game decision(win/lose)+show result in UART/LED
 	call	initial	;from initialization to green(yes) calculation (light calculation)
@@ -120,11 +67,11 @@ calculate_validate ;compare the guess and answer and make an end game decision(w
 	goto	start	;restart the game
 
 ;debug purpose
-write_ans
-	movf	POSTINC2, W				;use the pressed button to obtain the data from bank6
-	call	write
-	return
-	
+;write_ans
+;	movf	POSTINC2, W				;use the pressed button to obtain the data from bank6
+;	call	write
+;	return
+;	
 	end
 
 
