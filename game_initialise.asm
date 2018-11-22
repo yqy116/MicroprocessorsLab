@@ -1,5 +1,5 @@
 #include p18f87k22.inc
-    global  game_startup,game_counter,game_tries
+    global  game_startup,game_counter,game_tries, enter_key
     extern  UART_Setup,LCD_Setup,lookup
     extern  keyboard, tempo
 ;this code initialse the setup and game tries
@@ -47,4 +47,12 @@ game_counter_10
     movlw   0x0A
     movwf   game_counter
     return  
+    
+enter_key
+	call	keyboard    ;to enable keypad (keyboard)
+	movlw	0xEB	    ;only when you press E the code will procede
+	CPFSEQ	tempo	    ;tempo is the uncoded value of the paypad when it is pressed
+	bra	enter_key	;loop until E is pressed in keypad. The keypad value won't proceed until E is pressed
+	return
+	
     END
