@@ -1,5 +1,5 @@
 #include p18f87k22.inc
-	extern	game_startup,game_tries
+	extern	game_startup,game_tries,enter_key
 	extern	keyin
 	extern	initial
 	extern	startgame,trials
@@ -29,15 +29,8 @@ main	code
 start	call	game_startup	;initialise setup and game tries (game_initialise)
 	call	interrupt_setup	;start timer 0 and enable all flag setup (interrupt)
 	call	startgame   ;send start game message to lcd (end_start)
-	
-enter_key
-	call	keyboard    ;to enable keypad (keyboard)
-;	movlw	0xff	    ;when the keyboard isn't used, all bits are high.
-;	CPFSEQ	PORTE
-	movlw	0xEB	    ;only when you press E the code will procede
-	CPFSEQ	tempo	    ;tempo is the uncoded value of the paypad when it is pressed
-	bra	enter_key	;loop until E is pressed in keypad. The keypad value won't proceed until E is pressed
-	
+	call	enter_key   ;Proceed the game by pressing E (game_initialise)
+
 choose_tries
 	call	LCD_Clear   ;clear the previous message
 	call	trials	    ;print game tries message to LCD(end_start)
