@@ -64,9 +64,10 @@ iter	decf	temp_pst    ;push the value up depending on the number in y_count
 	bra	iter
 	return	
 	
-mutiplier   movlw   0x02    ;because t is a binary so mutiply by 2
-	    MULWF   temp_scr
-	    movff   PRODL, temp_scr ;this is the value to be set
+mutiplier   ;movlw   0x02    ;because t is a binary so mutiply by 2
+	    ;MULWF   temp_scr
+	    ;movff   PRODL, temp_scr ;this is the value to be set
+	    RLNCF    temp_scr, f    ;move the bit up
 	    return
 	    
 	    end
