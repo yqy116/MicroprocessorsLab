@@ -26,7 +26,7 @@ initial;All kind of initialization
 	call	LCD_Clear   ;to clear the guess value that was sent before(LCD)
 
 testtest	
-	call	validate    ;to calculate the number of correct positon+colour (game logic)
+	call	validate    ;to calculate the number of correct position+colour (game logic)
 	decfsz  pos_counter ;loop four times
 	goto	testtest
 	return
