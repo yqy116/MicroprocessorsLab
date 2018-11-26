@@ -23,13 +23,23 @@ Result:
 3)end-start.asm (Display the end game screen)
 
 Subroutine used:
+
 History_Result.asm (Send history of guess and result to simple serial port terminal)
+
 LCD.asm (Configurate the LCD, enable the LCD functions)
+
 UART.asm (Configurate the UART, enable the UART functions)
+
 Look_up_write.asm (translate the values into the colour ASCII character)
+
 count_colour.asm (count the number of each colour in the guess and answer)
+
 game_logic.asm (determine the number of correct position and colour)
+
 game_mode.asm (allow the selection of game mode)
+
 keyboard.asm (allow the use of keypad)
+
 manual_input.asm (allow the manual input of the answer)
+
 random_generate.asm (generate random number)
